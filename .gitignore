@@ -7,24 +7,31 @@ node_modules/
 
 
 # ======================================================
-# ENVIRONMENT VARIABLES / SECRETS
+# ENVIRONMENT VARIABLES
 # ======================================================
 
+# Par défaut, ignorer tous les fichiers .env
 .env
 .env.*
-!.env.example
 
+# Garder les fichiers d'exemple
+!.env.example
+!**/.env.example
+
+
+# API : garder les secrets privés
 api/.env
 api/.env.*
-!api/.env.example
 
-# webapp/.env
-# webapp/.env.*
-!webapp/.env.example
 
-mobileapp/.env
-mobileapp/.env.*
-!mobileapp/.env.example
+# WEBAPP : autoriser le .env
+# Il ne doit contenir que des variables publiques VITE_*
+!webapp/.env
+
+
+# MOBILEAPP : autoriser le .env
+# Il ne doit contenir que des variables publiques EXPO_PUBLIC_*
+!mobileapp/.env
 
 
 # ======================================================
@@ -63,14 +70,25 @@ dist-ssr/
 
 web-build/
 
+
+# ======================================================
+# MOBILE SIGNING / CREDENTIALS
+# ======================================================
+
 *.jks
+*.keystore
 *.p8
 *.p12
 *.key
 *.mobileprovision
 
-# EAS local builds
+
+# ======================================================
+# EAS LOCAL BUILDS
+# ======================================================
+
 eas-build-local-nodejs/
+
 *.apk
 *.aab
 *.ipa
@@ -83,7 +101,8 @@ eas-build-local-nodejs/
 api/uploads/*
 !api/uploads/.gitkeep
 
-# Si certains sous-dossiers doivent être conservés :
+# Si tu veux conserver certains sous-dossiers :
+#
 # !api/uploads/products/
 # api/uploads/products/*
 # !api/uploads/products/.gitkeep
@@ -112,11 +131,12 @@ coverage/
 
 
 # ======================================================
-# TEMP FILES
+# TEMPORARY FILES
 # ======================================================
 
 tmp/
 temp/
+
 *.tmp
 *.temp
 
@@ -139,7 +159,7 @@ temp/
 
 
 # ======================================================
-# OS FILES
+# OPERATING SYSTEM FILES
 # ======================================================
 
 .DS_Store
@@ -161,7 +181,7 @@ Desktop.ini
 
 
 # ======================================================
-# CLAUDE / LOCAL AI TOOL CONFIGURATION
+# CLAUDE / LOCAL AI CONFIGURATION
 # ======================================================
 
 .claude/
@@ -169,7 +189,7 @@ Desktop.ini
 
 
 # ======================================================
-# OTHER LOCAL CACHE
+# OTHER CACHE
 # ======================================================
 
 .cache/
