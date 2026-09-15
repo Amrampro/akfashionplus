@@ -1,4 +1,4 @@
-name: Build AK Fashion Plus
+name: Build and Deploy AK Fashion Plus
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,7 +16,7 @@ jobs:
       - name: Installer Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - name: Installer les dependances du web
         working-directory: ./webapp
@@ -32,7 +32,45 @@ jobs:
       - name: Copier webapp/dist vers api/dist
         run: cp -r ./webapp/dist ./api/dist
 
-      - name: Verifier le resultat
+      - name: Verifier api/dist
         run: |
           echo "Contenu de api/dist :"
           ls -la ./api/dist
+
+      - name: Configurer SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/github_akfashionplus
+          chmod 600 ~/.ssh/github_akfashionplus
+          ssh-keyscan -H "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Tester connexion SSH
+        run: |
+          ssh -i ~/.ssh/github_akfashionplus \
+          "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" \
+          "echo 'Connexion SSH GitHub -> Plesk OK'"
+
+      - name: Deployer API vers Plesk
+        run: |
+          rsync -avz --delete \
+            --exclude=".env" \
+            --exclude="node_modules/" \
+            --exclude="uploads/" \
+            -e "ssh -i ~/.ssh/github_akfashionplus" \
+            ./api/ \
+            "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}/"
+
+      - name: Installer les dependances backend
+        run: |
+          ssh -i ~/.ssh/github_akfashionplus \
+          "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" \
+          "export PATH=/var/www/vhosts/akfashionplus.com/.nodenv/bin:/var/www/vhosts/akfashionplus.com/.nodenv/shims:\$PATH && export NODENV_VERSION=24 && cd ${{ secrets.SERVER_PATH }} && node --version && npm --version && npm ci --omit=dev"
+
+      - name: Redemarrer application
+        run: |
+          ssh -i ~/.ssh/github_akfashionplus \
+          "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" \
+          "cd ${{ secrets.SERVER_PATH }} && mkdir -p tmp && touch tmp/restart.txt"
+
+      - name: Deployment termine
+        run: echo "AK Fashion Plus deployment completed successfully"
