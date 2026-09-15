@@ -457,7 +457,10 @@ function ShopProductCard({
       <button
         aria-label={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
         className={`favorite-pill ${isFavorite ? "active" : ""}`}
-        onClick={() => onToggleFavorite(product.id)}
+        onClick={(event) => {
+          event.stopPropagation();
+          onToggleFavorite(product.id);
+        }}
         type="button"
       >
         coeur
@@ -495,7 +498,10 @@ function ShopProductCard({
         <div className="shop-card-actions">
           <button
             disabled={!saleAvailable}
-            onClick={() => onAddToCart(toCartProduct(product), "purchase")}
+            onClick={(event) => {
+              event.stopPropagation();
+              onAddToCart(toCartProduct(product), "purchase");
+            }}
             type="button"
           >
             Acheter
@@ -503,7 +509,10 @@ function ShopProductCard({
           {rentalAvailable && (
             <button
               className="gold"
-              onClick={() => onAddToCart(toCartProduct(product), "rental")}
+              onClick={(event) => {
+                event.stopPropagation();
+                onAddToCart(toCartProduct(product), "rental");
+              }}
               type="button"
             >
               Louer

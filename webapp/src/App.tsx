@@ -505,6 +505,14 @@ function App() {
     go("home");
   }
 
+  const commitCart = useCallback((updater: (current: Product[]) => Product[]) => {
+    setCart((current) => {
+      const next = updater(current);
+      localStorage.setItem("ak_cart", JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   const addToCart = useCallback(
     (product: Product, requestedMode?: "purchase" | "rental") => {
       const rentalAvailable = Boolean(
@@ -520,7 +528,7 @@ function App() {
         return;
       }
 
-      setCart((current) => [
+      commitCart((current) => [
         ...current,
         {
           ...product,
@@ -530,7 +538,7 @@ function App() {
         },
       ]);
     },
-    [],
+    [commitCart],
   );
 
   const addRentalToCart = useCallback(
@@ -540,7 +548,7 @@ function App() {
       const rentalDeposit = Number(product.rentalDeposit || 0);
       const rentalEndDate = addDaysInputValue(rentalStartDate, days);
 
-      setCart((current) => [
+      commitCart((current) => [
         ...current,
         {
           ...product,
@@ -557,7 +565,7 @@ function App() {
       ]);
       setCartChoiceProduct(null);
     },
-    [],
+    [commitCart],
   );
 
   const clearCart = useCallback(() => {
@@ -713,8 +721,8 @@ function App() {
           exchangeRate={exchangeRate}
           go={go}
           remove={(cartId) =>
-            setCart(
-              cart.filter(
+            commitCart((current) =>
+              current.filter(
                 (item) => (item.cartId || String(item.id)) !== cartId,
               ),
             )

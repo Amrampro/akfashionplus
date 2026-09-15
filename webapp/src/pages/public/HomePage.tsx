@@ -528,7 +528,10 @@ function HomeProductCard({
         {rentalAvailable && <small>Location {eur(rentalPrice)} / jour</small>}
         <button
           disabled={!saleAvailable}
-          onClick={() => onAddToCart(toCartProduct(product), "purchase")}
+          onClick={(event) => {
+            event.stopPropagation();
+            onAddToCart(toCartProduct(product), "purchase");
+          }}
           type="button"
         >
           Ajouter au panier
@@ -536,7 +539,10 @@ function HomeProductCard({
         {rentalAvailable && (
           <button
             className="gold"
-            onClick={() => onAddToCart(toCartProduct(product), "rental")}
+            onClick={(event) => {
+              event.stopPropagation();
+              onAddToCart(toCartProduct(product), "rental");
+            }}
             type="button"
           >
             Louer
