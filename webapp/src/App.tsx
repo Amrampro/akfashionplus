@@ -333,6 +333,7 @@ function App() {
   const { language, setLanguage, t } = useLanguage();
   const [page, setPage] = useState(initialPage);
   const [cart, setCart] = useState<Product[]>(storedCart);
+  const [cartCount, setCartCount] = useState(() => storedCart().length);
   const [session, setSession] = useState<Session | null>(storedSession);
   const [authChecked, setAuthChecked] = useState(false);
   const [exchangeRate, setExchangeRate] = useState(1000);
@@ -397,7 +398,34 @@ function App() {
 
   useEffect(() => {
     localStorage.setItem("ak_cart", JSON.stringify(cart));
+    setCartCount(cart.length);
   }, [cart]);
+
+  useEffect(() => {
+    const syncCartFromStorage = () => {
+      const nextCart = storedCart();
+      setCart(nextCart);
+      setCartCount(nextCart.length);
+    };
+
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === "ak_cart") syncCartFromStorage();
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") syncCartFromStorage();
+    };
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("focus", syncCartFromStorage);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("focus", syncCartFromStorage);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -509,6 +537,7 @@ function App() {
     setCart((current) => {
       const next = updater(current);
       localStorage.setItem("ak_cart", JSON.stringify(next));
+      setCartCount(next.length);
       return next;
     });
   }, []);
@@ -570,6 +599,7 @@ function App() {
 
   const clearCart = useCallback(() => {
     setCart([]);
+    setCartCount(0);
     localStorage.removeItem("ak_cart");
   }, []);
 
@@ -603,7 +633,7 @@ function App() {
   ) : (
     <>
       <TopNav
-        cartCount={cart.length}
+        cartCount={cartCount}
         go={go}
         language={language}
         page={page}
