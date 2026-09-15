@@ -1,0 +1,38 @@
+name: Build AK Fashion Plus
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Installer les dependances du web
+        working-directory: ./webapp
+        run: npm ci
+
+      - name: Build du web
+        working-directory: ./webapp
+        run: npm run build
+
+      - name: Supprimer ancien dist dans API
+        run: rm -rf ./api/dist
+
+      - name: Copier webapp/dist vers api/dist
+        run: cp -r ./webapp/dist ./api/dist
+
+      - name: Verifier le resultat
+        run: |
+          echo "Contenu de api/dist :"
+          ls -la ./api/dist
