@@ -18,8 +18,8 @@ api/.env
 api/.env.*
 !api/.env.example
 
-webapp/.env
-webapp/.env.*
+# webapp/.env
+# webapp/.env.*
 !webapp/.env.example
 
 mobileapp/.env
