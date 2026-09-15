@@ -1,0 +1,1 @@
+import { endpoints } from './apiEndpoints'; import { get } from './api'; export const getAdminDashboard = () => get(endpoints.dashboards.admin); export const getCashierDashboard = () => get(endpoints.dashboards.cashier);

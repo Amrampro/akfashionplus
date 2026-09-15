@@ -1,0 +1,1 @@
+import { endpoints } from './apiEndpoints'; import { get } from './api'; export const getProducts = (query = '') => get(endpoints.products + query); export const getProduct = (slug: string) => get(endpoints.products + '/' + slug);

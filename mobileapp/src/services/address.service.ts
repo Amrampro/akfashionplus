@@ -1,0 +1,1 @@
+import { endpoints } from './apiEndpoints'; import { get, post } from './api'; export const getAddresses = () => get(endpoints.addresses); export const createAddress = (body: unknown) => post(endpoints.addresses, body);

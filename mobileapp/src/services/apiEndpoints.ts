@@ -1,0 +1,35 @@
+export const endpoints = {
+  auth: {
+    login: "/auth/login",
+    register: "/auth/register",
+    me: "/auth/me",
+  },
+  settings: "/settings",
+  products: "/products",
+  categories: "/categories",
+  branches: "/branches",
+  cart: "/cart",
+  cartItems: "/cart/items",
+  checkout: "/orders/checkout",
+  directCheckout: "/orders/direct-checkout",
+  orders: "/orders",
+  rentals: "/rentals",
+  resales: "/resales",
+  secondHandProposals: "/second-hand-proposals",
+  giftCardTypes: "/gift-cards/types",
+  giftCards: "/gift-cards",
+  favorites: "/favorites",
+  notifications: "/notifications",
+  addresses: "/addresses",
+  admin: (table: string) => `/admin/${table}`,
+  dashboards: {
+    admin: "/dashboard/admin",
+    cashier: "/dashboard/cashier",
+  },
+  payments: {
+    stripeIntent: "/payments/stripe-intent",
+    syncStripeIntent: (paymentIntentId: string) =>
+      `/payments/stripe-intent/${paymentIntentId}/sync`,
+    stripeCheckoutSession: "/payments/stripe-checkout-session",
+  },
+};

@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "AK Fashion Plus",
+    "slug": "ak-fashion-plus",
+    "scheme": "akfashionplus",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.akfashionplus.app",
+      "buildNumber": "1"
+    },
+
+    "android": {
+      "package": "com.akfashionplus.app",
+      "versionCode": 1,
+
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+
+    "plugins": [
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.akfashionplus.mobile",
+          "enableGooglePay": true
+        }
+      ]
+    ]
+  }
+}
