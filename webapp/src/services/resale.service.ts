@@ -1,0 +1,1 @@
+import { endpoints } from './apiEndpoints'; import { get, post } from './api'; export const getResales = () => get(endpoints.resales); export const payResale = (id: number, body: unknown) => post(endpoints.resales + '/' + id + '/pay', body);

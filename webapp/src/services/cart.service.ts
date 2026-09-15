@@ -1,0 +1,1 @@
+import { endpoints } from './apiEndpoints'; import { get, post, del } from './api'; export const getCart = () => get(endpoints.cart); export const addCartItem = (body: unknown) => post(endpoints.cartItems, body); export const removeCartItem = (id: number) => del(endpoints.cartItems + '/' + id);

@@ -1,0 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useState, type ReactNode } from 'react'; import type { User } from '../types';
+export const AuthContext = createContext({ user: null as User | null, token: localStorage.getItem('ak_token'), setSession: (user: User | null, token?: string) => { void user; void token; }, logout: () => {} });
+export function AuthProvider({ children }: { children: ReactNode }) { const [user, setUser] = useState<User | null>(null); const [token, setToken] = useState(localStorage.getItem('ak_token')); const setSession = (u: User | null, t?: string) => { setUser(u); if (t) { localStorage.setItem('ak_token', t); setToken(t); } }; const logout = () => { localStorage.removeItem('ak_token'); setToken(null); setUser(null); }; return <AuthContext.Provider value={{ user, token, setSession, logout }}>{children}</AuthContext.Provider>; }

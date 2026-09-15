@@ -1,0 +1,1 @@
+import { endpoints } from './apiEndpoints'; import { get, post, del } from './api'; export const getFavorites = () => get(endpoints.favorites); export const addFavorite = (id: number) => post(endpoints.favorites + '/' + id); export const removeFavorite = (id: number) => del(endpoints.favorites + '/' + id);

@@ -1,0 +1,1 @@
+import { endpoints } from './apiEndpoints'; import { get, post } from './api'; export const checkout = (body: unknown) => post(endpoints.checkout, body); export const getOrders = () => get(endpoints.orders); export const getOrder = (id: number) => get(endpoints.orders + '/' + id);

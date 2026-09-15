@@ -1,0 +1,1 @@
+import { endpoints } from './apiEndpoints'; import { get } from './api'; export const getGiftCardTypes = () => get(endpoints.giftCardTypes); export const getGiftCards = () => get(endpoints.giftCards);

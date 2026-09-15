@@ -1,0 +1,2 @@
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useState, type ReactNode } from 'react'; export const CartContext = createContext({ count: 0, setCount: (count: number) => { void count; } }); export function CartProvider({ children }: { children: ReactNode }) { const [count, setCount] = useState(0); return <CartContext.Provider value={{ count, setCount }}>{children}</CartContext.Provider>; }

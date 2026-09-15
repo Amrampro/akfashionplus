@@ -1,0 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useMemo, useState, type ReactNode } from 'react'; import fr from '../locales/fr'; import en from '../locales/en'; import pt from '../locales/pt'; import type { Language } from '../types';
+export const LanguageContext = createContext({ language: 'fr' as Language, setLanguage: (language: Language) => { void language; }, t: fr as Record<string, string> });
+export function LanguageProvider({ children }: { children: ReactNode }) { const [language, setLanguage] = useState<Language>((localStorage.getItem('ak_language') as Language) || 'fr'); const t = useMemo(() => ({ fr, en, pt }[language] as Record<string,string>), [language]); const update = (next: Language) => { localStorage.setItem('ak_language', next); setLanguage(next); }; return <LanguageContext.Provider value={{ language, setLanguage: update, t }}>{children}</LanguageContext.Provider>; }
