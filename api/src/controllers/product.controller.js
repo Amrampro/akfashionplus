@@ -6,7 +6,7 @@ import { toAoa } from "../utils/currency.js";
 const languages = new Set(["fr", "en", "pt"]);
 
 function requestLanguage(req) {
-  return languages.has(req.lang) ? req.lang : "fr";
+  return languages.has(req.lang) ? req.lang : "pt";
 }
 
 function productPayload(body, userId = null) {

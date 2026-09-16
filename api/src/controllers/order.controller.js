@@ -352,7 +352,7 @@ export async function checkout(req, res) {
           product_id: item.product_id,
           product_variant_id: item.product_variant_id,
           item_type: item.item_type,
-          product_name: localizedProductName(item, req.body.language || "fr"),
+          product_name: localizedProductName(item, req.body.language || "pt"),
           sku: item.sku,
           size: item.size,
           color: item.color_name,

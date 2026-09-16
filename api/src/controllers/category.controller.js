@@ -16,7 +16,7 @@ const writableFields = [
 ];
 
 function language(req) {
-  return ["fr", "en", "pt"].includes(req.lang) ? req.lang : "fr";
+  return ["fr", "en", "pt"].includes(req.lang) ? req.lang : "pt";
 }
 
 function pickPayload(body) {

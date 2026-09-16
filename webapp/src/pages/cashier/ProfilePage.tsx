@@ -33,7 +33,7 @@ const defaultProfile: Profile = {
   last_name: "",
   email: "",
   phone: "",
-  preferred_language: "fr",
+  preferred_language: "pt",
   country_code: "AO",
   avatar_url: "",
   status: "active",

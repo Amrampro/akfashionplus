@@ -30,7 +30,7 @@ const localeByLanguage: Record<Language, string> = {
 
 export function normalizeLanguage(language?: Language | string | null): Language {
   if (language === "en" || language === "pt") return language;
-  return "fr";
+  return "pt";
 }
 
 function readTranslation(dictionary: Dictionary, key: string): string | undefined {
@@ -52,14 +52,14 @@ function interpolate(template: string, params?: TranslationParams) {
 }
 
 export const LanguageContext = createContext<LanguageContextValue>({
-  language: "fr",
-  locale: "fr-FR",
+  language: "pt",
+  locale: "pt-PT",
   setLanguage: () => {},
   t: (key) => key,
 });
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, updateLanguage] = useState<Language>("fr");
+  const [language, updateLanguage] = useState<Language>("pt");
 
   const setLanguage = useCallback((nextLanguage?: Language | string | null) => {
     updateLanguage(normalizeLanguage(nextLanguage));

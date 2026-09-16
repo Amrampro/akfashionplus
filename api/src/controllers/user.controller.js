@@ -93,7 +93,7 @@ export async function createUser(req, res) {
     email: String(req.body.email).toLowerCase(),
     phone: req.body.phone || null,
     password_hash: hashPassword(req.body.password),
-    preferred_language: req.body.preferred_language || "fr",
+    preferred_language: req.body.preferred_language || "pt",
     country_code: req.body.country_code || null,
     referral_code: null,
     status: req.body.status || "active",

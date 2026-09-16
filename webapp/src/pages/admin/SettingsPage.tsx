@@ -637,7 +637,7 @@ function SettingsGroup({
                   onChange={(event) =>
                     onChange({ ...form, [key]: event.target.value })
                   }
-                  value={form[key] || "fr"}
+                  value={form[key] || "pt"}
                 >
                   <option value="fr">FR - Francais</option>
                   <option value="en">EN - English</option>

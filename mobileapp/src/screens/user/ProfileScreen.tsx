@@ -57,7 +57,7 @@ function formFromUser(user: AuthUser | null): ProfileForm {
     last_name: user?.last_name || "",
     email: user?.email || "",
     phone: user?.phone || "",
-    preferred_language: user?.preferred_language || "fr",
+    preferred_language: user?.preferred_language || "pt",
     country_code: user?.country_code || "",
     avatar_url: user?.avatar_url || "",
   };
@@ -148,7 +148,7 @@ export default function ProfileScreen({ onBack, onLogin }: Props) {
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
         phone: form.phone.trim() || null,
-        preferred_language: form.preferred_language || "fr",
+        preferred_language: form.preferred_language || "pt",
         country_code: form.country_code.trim() || null,
         avatar_url: form.avatar_url.trim() || null,
       });

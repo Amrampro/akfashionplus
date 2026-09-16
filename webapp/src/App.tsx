@@ -1317,7 +1317,7 @@ function TopNav({
               <path d="M7 8V7a5 5 0 0 1 10 0v1" />
               <path d="M5.5 8h13l1 12h-15l1-12Z" />
             </svg>
-            <strong>{cartCount}</strong>
+            <strong data-no-translate>{cartCount}</strong>
           </a>
           <button
             className="account-button"

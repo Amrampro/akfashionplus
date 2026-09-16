@@ -177,7 +177,7 @@ CREATE TABLE users (
         'fr',
         'en',
         'pt'
-    ) NOT NULL DEFAULT 'fr',
+    ) NOT NULL DEFAULT 'pt',
 
     country_code CHAR(2) NULL,
 
@@ -332,7 +332,7 @@ VALUES
 ),
 (
     'default_language',
-    'fr',
+    'pt',
     'Default application language'
 ),
 (

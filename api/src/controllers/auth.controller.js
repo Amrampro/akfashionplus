@@ -27,7 +27,7 @@ export async function register(req, res) {
     password,
     phone = null,
     country_code = null,
-    preferred_language = "fr",
+    preferred_language = "pt",
     referral_code = null,
     ref = null,
   } = req.body;
@@ -50,7 +50,7 @@ export async function register(req, res) {
 
   const language = ["fr", "en", "pt"].includes(preferred_language)
     ? preferred_language
-    : "fr";
+    : "pt";
 
   try {
     const referralRows = referral_code || ref

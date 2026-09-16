@@ -5,6 +5,14 @@ type TextMap = Record<string, string>;
 const textOriginals = new WeakMap<Text, string>();
 const attrOriginals = new WeakMap<Element, Record<string, string>>();
 
+function shouldSkipElement(element: Element) {
+  return Boolean(element.closest("[data-no-translate], [data-dynamic-text]"));
+}
+
+function isDynamicText(value: string) {
+  return /^\d+$/.test(value.trim());
+}
+
 function translateValue(value: string, language: Language, dictionary: TextMap) {
   if (language === "fr") return value;
   const trimmed = value.trim();
@@ -27,7 +35,9 @@ export function translatePublicDom(
       if (["SCRIPT", "STYLE", "TEXTAREA"].includes(parent.tagName)) {
         return NodeFilter.FILTER_REJECT;
       }
+      if (shouldSkipElement(parent)) return NodeFilter.FILTER_REJECT;
       if (!node.textContent?.trim()) return NodeFilter.FILTER_REJECT;
+      if (isDynamicText(node.textContent)) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
     },
   });
@@ -43,6 +53,7 @@ export function translatePublicDom(
 
   root.querySelectorAll?.("[placeholder], [aria-label], [title]").forEach(
     (element) => {
+      if (shouldSkipElement(element)) return;
       const originals = attrOriginals.get(element) || {};
       ["placeholder", "aria-label", "title"].forEach((attribute) => {
         const current = element.getAttribute(attribute);
