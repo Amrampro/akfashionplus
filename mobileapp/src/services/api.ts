@@ -12,10 +12,12 @@ export async function apiRequest<T>(
   options: RequestInit = {},
 ): Promise<T> {
   const token = await storage.get("auth_token");
+  const language = (await storage.get("language")) || "pt";
   const response = await fetch(appConfig.apiUrl + path, {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      "X-Language": language,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
@@ -32,9 +34,11 @@ export async function apiRequest<T>(
 
 export async function postForm<T>(path: string, body: FormData): Promise<T> {
   const token = await storage.get("auth_token");
+  const language = (await storage.get("language")) || "pt";
   const response = await fetch(appConfig.apiUrl + path, {
     method: "POST",
     headers: {
+      "X-Language": language,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body,

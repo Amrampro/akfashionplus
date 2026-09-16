@@ -257,7 +257,7 @@ export default function SettingsPage({
   const stats = useMemo(
     () => ({
       count: settings.length,
-      languages: form.default_language?.toUpperCase() || "FR",
+      languages: form.default_language?.toUpperCase() || "PT",
       currency: `${form.default_currency || "EUR"} / ${form.display_currency || "AOA"}`,
       lateFee: Number(form.rental_late_fee_per_day_eur || 0),
     }),

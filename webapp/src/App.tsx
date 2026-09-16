@@ -53,6 +53,16 @@ import "./App.css";
 
 type Role = "user" | "cashier" | "admin";
 type Language = "fr" | "en" | "pt";
+
+function normalizeLanguage(value: unknown): Language | null {
+  return value === "fr" || value === "en" || value === "pt"
+    ? (value as Language)
+    : null;
+}
+
+function storedLanguage() {
+  return normalizeLanguage(localStorage.getItem("ak_language"));
+}
 type Product = {
   id: number;
   variantId?: number | null;
@@ -365,7 +375,7 @@ function App() {
 
       try {
         const response = await fetch(`${API_URL}/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}`, "X-Language": language },
         });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok || payload.success === false) {
@@ -377,8 +387,12 @@ function App() {
         localStorage.setItem("ak_auth_user", JSON.stringify(nextSession));
         if (active) {
           setSession(nextSession);
-          if (["fr", "en", "pt"].includes(user?.preferred_language)) {
-            setLanguage(user.preferred_language as Language);
+          const profileLanguage = normalizeLanguage(user?.preferred_language);
+          const localLanguage = storedLanguage();
+          if (localLanguage) {
+            setLanguage(localLanguage);
+          } else if (profileLanguage) {
+            setLanguage(profileLanguage);
           }
         }
       } catch {
@@ -394,7 +408,23 @@ function App() {
     return () => {
       active = false;
     };
-  }, [setLanguage]);
+  }, [language, setLanguage]);
+
+  useEffect(() => {
+    if (!authChecked || !session) return;
+    const token = localStorage.getItem("ak_auth_token");
+    if (!token) return;
+
+    fetch(`${API_URL}/users/me`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "X-Language": language,
+      },
+      body: JSON.stringify({ preferred_language: language }),
+    }).catch(() => {});
+  }, [authChecked, language, session]);
 
   useEffect(() => {
     localStorage.setItem("ak_cart", JSON.stringify(cart));
@@ -430,7 +460,9 @@ function App() {
   useEffect(() => {
     let active = true;
 
-    fetch(`${API_URL}/settings`)
+    fetch(`${API_URL}/settings`, {
+      headers: { "X-Language": language },
+    })
       .then((response) => response.json())
       .then((payload) => {
         const rate = Number(payload?.data?.exchange_rate_eur_to_aoa || 0);
@@ -455,7 +487,7 @@ function App() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [language]);
 
   function go(next: string) {
     const path = pageToPath(next);
@@ -470,7 +502,7 @@ function App() {
     setAuthMessage("");
     const response = await fetch(`${API_URL}/auth/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Language": language },
       body: JSON.stringify({
         email: credentials.email,
         password: credentials.password,
@@ -489,8 +521,9 @@ function App() {
     localStorage.setItem("ak_auth_user", JSON.stringify(nextSession));
     setSession(nextSession);
     setAuthMessage("Connexion effectuee.");
-    if (["fr", "en", "pt"].includes(user?.preferred_language)) {
-      setLanguage(user.preferred_language as Language);
+    const profileLanguage = normalizeLanguage(user?.preferred_language);
+    if (!storedLanguage() && profileLanguage) {
+      setLanguage(profileLanguage);
     }
     go(consumePostAuthRedirect(role) || dashboardPageForRole(role));
   }
@@ -499,7 +532,7 @@ function App() {
     setAuthMessage("");
     const response = await fetch(`${API_URL}/auth/register`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Language": language },
       body: JSON.stringify({
         first_name: data.firstName,
         last_name: data.lastName,
@@ -1527,6 +1560,7 @@ function CheckoutPage({
   go: (page: string) => void;
   setSession: (session: Session | null) => void;
 }) {
+  const { language } = useLanguage();
   const [beneficiaryName, setBeneficiaryName] = useState("Ana Kiala");
   const [beneficiaryPhone, setBeneficiaryPhone] = useState("+244 912 345 678");
   const [address, setAddress] = useState("Rua Rainha Ginga, No 23");
@@ -1640,7 +1674,9 @@ function CheckoutPage({
 
   async function resolveCartVariant(item: Product) {
     if (item.variantId) return item.variantId;
-    const response = await fetch(`${API_URL}/products/${item.slug}?lang=fr`);
+    const response = await fetch(`${API_URL}/products/${item.slug}?lang=${language}`, {
+      headers: { "X-Language": language },
+    });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok || payload.success === false || !payload.data) {
       throw new Error(
@@ -1720,6 +1756,7 @@ function CheckoutPage({
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
+          "X-Language": language,
         },
         body: JSON.stringify({
           beneficiary_name: beneficiaryName,
@@ -1778,6 +1815,7 @@ function CheckoutPage({
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
+              "X-Language": language,
             },
             body: JSON.stringify({
               amount_eur: orderRemainingDue,

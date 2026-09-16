@@ -2,11 +2,13 @@ import {
   createContext,
   useContext,
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
 import type { Language } from "../types";
+import { storage } from "../utils/storage";
 import en from "../locales/en";
 import fr from "../locales/fr";
 import pt from "../locales/pt";
@@ -62,7 +64,25 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, updateLanguage] = useState<Language>("pt");
 
   const setLanguage = useCallback((nextLanguage?: Language | string | null) => {
-    updateLanguage(normalizeLanguage(nextLanguage));
+    const normalized = normalizeLanguage(nextLanguage);
+    storage.set("language", normalized).catch(() => {});
+    updateLanguage(normalized);
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    storage
+      .get("language")
+      .then((savedLanguage) => {
+        if (mounted && savedLanguage) {
+          updateLanguage(normalizeLanguage(savedLanguage));
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const t = useCallback(

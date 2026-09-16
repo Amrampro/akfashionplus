@@ -44,6 +44,7 @@ import SecondHandProposalPriceScreen from "./src/screens/user/SecondHandProposal
 import SecondHandSalesScreen from "./src/screens/user/SecondHandSalesScreen";
 import UserDashboardScreen from "./src/screens/user/UserDashboardScreen";
 import type { SecondHandProposalForm } from "./src/types";
+import { storage } from "./src/utils/storage";
 
 type Screen =
   | { name: "home" }
@@ -77,7 +78,24 @@ function UserLanguageSync() {
   const { setLanguage } = useLanguage();
 
   useEffect(() => {
-    setLanguage(normalizeLanguage(user?.preferred_language));
+    let mounted = true;
+    storage
+      .get("language")
+      .then((savedLanguage) => {
+        if (!mounted) return;
+        setLanguage(
+          savedLanguage
+            ? normalizeLanguage(savedLanguage)
+            : normalizeLanguage(user?.preferred_language),
+        );
+      })
+      .catch(() => {
+        if (mounted) setLanguage(normalizeLanguage(user?.preferred_language));
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, [setLanguage, user?.preferred_language]);
 
   return null;

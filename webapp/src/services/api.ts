@@ -6,10 +6,12 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const token =
     localStorage.getItem("ak_auth_token") || localStorage.getItem("ak_token");
+  const language = localStorage.getItem("ak_language") || "pt";
   const response = await fetch(appConfig.apiUrl + path, {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      "X-Language": language,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
@@ -44,9 +46,11 @@ async function formRequest<T>(
 ): Promise<T> {
   const token =
     localStorage.getItem("ak_auth_token") || localStorage.getItem("ak_token");
+  const language = localStorage.getItem("ak_language") || "pt";
   const response = await fetch(appConfig.apiUrl + path, {
     method,
     headers: {
+      "X-Language": language,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body,

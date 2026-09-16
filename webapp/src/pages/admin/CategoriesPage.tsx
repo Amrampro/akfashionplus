@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
+import { useLanguage } from "../../hooks/useLanguage";
 import { del, get, post, postForm, put } from "../../services/api";
 
 type AdminCategoriesPageProps = {
@@ -92,15 +93,16 @@ export default function CategoriesPage({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [deleteWarning, setDeleteWarning] = useState("");
+  const { language } = useLanguage();
 
   useEffect(() => {
     loadCategories();
-  }, []);
+  }, [language]);
 
   function loadCategories() {
     setLoading(true);
     setError("");
-    get<Category[]>("/categories?admin=1&lang=fr")
+    get<Category[]>(`/categories?admin=1&lang=${language}`)
       .then((rows) => setCategories(rows || []))
       .catch((requestError: Error) => setError(requestError.message))
       .finally(() => setLoading(false));

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
+import { useLanguage } from "../../hooks/useLanguage";
 import { get, post, put } from "../../services/api";
 
 type AdminGiftCardsPageProps = {
@@ -170,6 +171,7 @@ export default function GiftCardsPage({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const { language } = useLanguage();
 
   useEffect(() => {
     loadData();
@@ -178,13 +180,13 @@ export default function GiftCardsPage({
         setUsers((rows || []).filter((user) => user.role === "user")),
       )
       .catch(() => setUsers([]));
-  }, []);
+  }, [language]);
 
   function loadData() {
     setLoading(true);
     setError("");
     Promise.all([
-      get<GiftCardType[]>("/gift-cards/types?admin=1&lang=fr"),
+      get<GiftCardType[]>(`/gift-cards/types?admin=1&lang=${language}`),
       get<GiftCard[]>("/gift-cards"),
     ])
       .then(([typeRows, cardRows]) => {

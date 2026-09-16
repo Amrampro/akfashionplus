@@ -2,9 +2,9 @@ const allowed = new Set(["fr", "en", "pt"]);
 
 export function languageMiddleware(req, _res, next) {
   const raw =
-    req.headers["accept-language"] ||
     req.headers["x-language"] ||
-    req.query.lang;
+    req.query.lang ||
+    req.headers["accept-language"];
   const lang = String(raw || "pt")
     .slice(0, 2)
     .toLowerCase();
