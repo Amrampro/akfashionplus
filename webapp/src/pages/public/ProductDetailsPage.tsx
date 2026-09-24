@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { appConfig } from "../../config/app";
 import { useLanguage } from "../../hooks/useLanguage";
 
@@ -134,6 +135,7 @@ export default function ProductDetailsPage({
     null,
   );
   const [isFavorite, setIsFavorite] = useState(false);
+  const [favoritePending, setFavoritePending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -155,7 +157,12 @@ export default function ProductDetailsPage({
           throw new Error(payload.message || "Produit introuvable");
         const data = payload.data as ProductDetails;
         setProduct(data);
-        setSelectedImage(data.images?.[0]?.image_url || data.image_url || "");
+        setSelectedImage(
+          data.images?.find((image) => image.is_primary)?.image_url ||
+            data.images?.[0]?.image_url ||
+            data.image_url ||
+            "",
+        );
         setSelectedVariantId(
           data.variants?.find((variant) => variant.status === "active")?.id ||
             data.variants?.[0]?.id ||
@@ -199,23 +206,28 @@ export default function ProductDetailsPage({
   }, [product]);
 
   async function toggleFavorite() {
-    if (!product) return;
+    if (!product || favoritePending) return;
     const token = localStorage.getItem("ak_auth_token");
     if (!token) {
       go("login");
       return;
     }
 
-    const response = await fetch(`${API_URL}/favorites/${product.id}`, {
-      method: isFavorite ? "DELETE" : "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok || payload.success === false) {
-      setError(payload.message || "Impossible de modifier les favoris.");
-      return;
+    setFavoritePending(true);
+    try {
+      const response = await fetch(`${API_URL}/favorites/${product.id}`, {
+        method: isFavorite ? "DELETE" : "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || payload.success === false) {
+        setError(payload.message || "Impossible de modifier les favoris.");
+        return;
+      }
+      setIsFavorite((current) => !current);
+    } finally {
+      setFavoritePending(false);
     }
-    setIsFavorite((current) => !current);
   }
 
   const selectedVariant = useMemo(
@@ -275,6 +287,18 @@ export default function ProductDetailsPage({
           },
         ]
       : [];
+  const selectedImageIndex = Math.max(
+    gallery.findIndex((image) => image.image_url === selectedImage),
+    0,
+  );
+  const stockAvailable = !selectedVariant || availableStock > 0;
+
+  function selectRelativeImage(direction: -1 | 1) {
+    if (gallery.length < 2) return;
+    const nextIndex =
+      (selectedImageIndex + direction + gallery.length) % gallery.length;
+    setSelectedImage(gallery[nextIndex].image_url);
+  }
 
   return (
     <section className="product-details-page">
@@ -287,12 +311,46 @@ export default function ProductDetailsPage({
       </button>
 
       <div className="product-details-shell">
-        <div className="details-gallery-panel">
+        <motion.div
+          animate={{ opacity: 1, y: 0 }}
+          className="details-gallery-panel"
+          initial={{ opacity: 0, y: 18 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="details-main-image">
             {selectedImage ? (
-              <img src={selectedImage} alt={product.name} />
+              <AnimatePresence mode="wait">
+                <motion.img
+                  animate={{ opacity: 1, scale: 1 }}
+                  alt={product.name}
+                  exit={{ opacity: 0, scale: 0.985 }}
+                  initial={{ opacity: 0, scale: 1.015 }}
+                  key={selectedImage}
+                  src={selectedImage}
+                  transition={{ duration: 0.26 }}
+                />
+              </AnimatePresence>
             ) : (
               <ProductVisual tone={product.slug} />
+            )}
+            {gallery.length > 1 && (
+              <div className="details-gallery-controls">
+                <button
+                  aria-label="Image precedente"
+                  onClick={() => selectRelativeImage(-1)}
+                  type="button"
+                >
+                  &larr;
+                </button>
+                <span>{selectedImageIndex + 1} / {gallery.length}</span>
+                <button
+                  aria-label="Image suivante"
+                  onClick={() => selectRelativeImage(1)}
+                  type="button"
+                >
+                  &rarr;
+                </button>
+              </div>
             )}
           </div>
           <div className="details-thumbs">
@@ -304,15 +362,21 @@ export default function ProductDetailsPage({
                 type="button"
               >
                 <img
+                  loading="lazy"
                   src={image.image_url}
                   alt={image.alt_text || product.name}
                 />
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        <aside className="details-info-panel">
+        <motion.aside
+          animate={{ opacity: 1, y: 0 }}
+          className="details-info-panel"
+          initial={{ opacity: 0, y: 18 }}
+          transition={{ delay: 0.08, duration: 0.5 }}
+        >
           <p className="eyebrow">{product.category_name}</p>
           <h1>{product.name}</h1>
           <div className="details-rating">
@@ -360,7 +424,7 @@ export default function ProductDetailsPage({
 
           <div className="purchase-actions">
             <button
-              disabled={!saleAvailable}
+              disabled={!saleAvailable || !stockAvailable}
               onClick={() =>
                 onAddToCart(toCartProduct(product, selectedVariant), "purchase")
               }
@@ -370,7 +434,7 @@ export default function ProductDetailsPage({
             </button>
             <button
               className="gold"
-              disabled={!rentalAvailable}
+              disabled={!rentalAvailable || !stockAvailable}
               onClick={() =>
                 onAddToCart(toCartProduct(product, selectedVariant), "rental")
               }
@@ -380,6 +444,7 @@ export default function ProductDetailsPage({
             </button>
             <button
               className={`favorite-action ${isFavorite ? "active" : ""}`}
+              disabled={favoritePending}
               onClick={() => void toggleFavorite()}
               type="button"
             >
@@ -397,7 +462,7 @@ export default function ProductDetailsPage({
               au moment du chargement.
             </li>
           </ul>
-        </aside>
+        </motion.aside>
       </div>
 
       <section className="details-reviews">

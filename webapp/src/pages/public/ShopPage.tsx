@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { appConfig } from "../../config/app";
 import { useLanguage } from "../../hooks/useLanguage";
 
@@ -105,6 +106,7 @@ export default function ShopPage({
 }) {
   const { language } = useLanguage();
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [category, setCategory] = useState("");
   const [condition, setCondition] = useState(
     initialMode === "new"
@@ -123,12 +125,19 @@ export default function ShopPage({
   const [error, setError] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
+  const [favoritePendingIds, setFavoritePendingIds] = useState<number[]>([]);
   const [displayCurrency, setDisplayCurrency] = useState("AOA");
+  const [sort, setSort] = useState("featured");
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setDebouncedQuery(query.trim()), 280);
+    return () => window.clearTimeout(timeout);
+  }, [query]);
 
   useEffect(() => {
     const controller = new AbortController();
     const params = new URLSearchParams({ limit: "48", lang: language });
-    if (query.trim()) params.set("q", query.trim());
+    if (debouncedQuery) params.set("q", debouncedQuery);
     if (category) params.set("category_id", category);
     if (condition) params.set("condition_type", condition);
     if (availability === "rental") params.set("rental", "1");
@@ -175,7 +184,7 @@ export default function ShopPage({
       });
 
     return () => controller.abort();
-  }, [availability, category, condition, language, query]);
+  }, [availability, category, condition, debouncedQuery, language]);
 
   useEffect(() => {
     fetch(`${API_URL}/settings`)
@@ -224,38 +233,73 @@ export default function ShopPage({
       return;
     }
 
-    const isFavorite = favoriteIds.includes(productId);
-    const response = await fetch(`${API_URL}/favorites/${productId}`, {
-      method: isFavorite ? "DELETE" : "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok || payload.success === false) {
-      setError(payload.message || "Impossible de modifier les favoris.");
-      return;
-    }
+    if (favoritePendingIds.includes(productId)) return;
+    setFavoritePendingIds((current) => [...current, productId]);
+    try {
+      const isFavorite = favoriteIds.includes(productId);
+      const response = await fetch(`${API_URL}/favorites/${productId}`, {
+        method: isFavorite ? "DELETE" : "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || payload.success === false) {
+        setError(payload.message || "Impossible de modifier les favoris.");
+        return;
+      }
 
-    setFavoriteIds((current) =>
-      isFavorite
-        ? current.filter((id) => id !== productId)
-        : [...current, productId],
-    );
+      setFavoriteIds((current) =>
+        isFavorite
+          ? current.filter((id) => id !== productId)
+          : [...current, productId],
+      );
+    } finally {
+      setFavoritePendingIds((current) =>
+        current.filter((id) => id !== productId),
+      );
+    }
   }
 
   const activeCategory = categories.find(
     (item) => String(item.id) === category,
   );
+  const visibleProducts = useMemo(() => {
+    const next = [...products];
+    if (sort === "price-asc") {
+      return next.sort(
+        (a, b) => Number(a.sale_price_eur || 0) - Number(b.sale_price_eur || 0),
+      );
+    }
+    if (sort === "price-desc") {
+      return next.sort(
+        (a, b) => Number(b.sale_price_eur || 0) - Number(a.sale_price_eur || 0),
+      );
+    }
+    if (sort === "rating") {
+      return next.sort(
+        (a, b) => Number(b.average_rating || 0) - Number(a.average_rating || 0),
+      );
+    }
+    return next.sort((a, b) => Number(b.featured) - Number(a.featured));
+  }, [products, sort]);
+  const modeCopy = {
+    shop: ["Boutique", "Le vestiaire AK Fashion Plus", "Achat, location et pieces choisies pour toutes vos occasions."],
+    new: ["Nouveautes", "Les nouvelles pieces du vestiaire", "Decouvrez les derniers articles ajoutes au catalogue."],
+    "second-hand": ["Seconde main", "Des pieces qui meritent une nouvelle histoire", "Une selection verifiee, disponible a l'achat et presentee avec transparence."],
+    rental: ["Location", "L'exceptionnel, le temps d'une occasion", "Robes, costumes et accessoires disponibles avec retrait securise."],
+  }[initialMode];
 
   return (
     <section className="shop-page">
-      <div className="shop-hero">
+      <motion.div
+        animate={{ opacity: 1, y: 0 }}
+        className={`shop-hero shop-hero-${initialMode}`}
+        initial={{ opacity: 0, y: 20 }}
+        transition={{ duration: 0.55 }}
+      >
         <div>
-          <p className="eyebrow">Boutique</p>
-          <h1>Catalogue AK Fashion Plus</h1>
-          <p>
-            Produits charges depuis la base de donnees avec filtres par
-            categorie, etat neuf/seconde main, achat et disponibilite location.
-          </p>
+          <p className="eyebrow">{modeCopy[0]}</p>
+          <h1>{modeCopy[1]}</h1>
+          <p>{modeCopy[2]}</p>
         </div>
         <div className="shop-search-card">
           <label htmlFor="shop-search">Recherche</label>
@@ -271,7 +315,7 @@ export default function ShopPage({
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       <div className="shop-shell">
         <aside
@@ -285,7 +329,11 @@ export default function ShopPage({
             <span>Filtres</span>
             <strong>{filtersOpen ? "Fermer" : "Ouvrir"}</strong>
           </button>
-          <div className="filter-content">
+          <motion.div
+            animate={{ opacity: 1, height: "auto" }}
+            className="filter-content"
+            initial={{ opacity: 0, height: 0 }}
+          >
             <div className="filter-section">
               <h2>Categories</h2>
               <button
@@ -342,7 +390,7 @@ export default function ShopPage({
                 </button>
               ))}
             </div>
-          </div>
+          </motion.div>
         </aside>
 
         <div className="shop-content">
@@ -369,10 +417,15 @@ export default function ShopPage({
                     : "Achat & location"}
               </span>
             </div>
-            <div className="shop-sort">
-              <span>Tri</span>
-              <strong>Recents / featured</strong>
-            </div>
+            <label className="shop-sort">
+              <span>Trier par</span>
+              <select value={sort} onChange={(event) => setSort(event.target.value)}>
+                <option value="featured">Selections AK</option>
+                <option value="rating">Mieux notes</option>
+                <option value="price-asc">Prix croissant</option>
+                <option value="price-desc">Prix decroissant</option>
+              </select>
+            </label>
           </div>
 
           {error && <div className="shop-message error">{error}</div>}
@@ -385,13 +438,14 @@ export default function ShopPage({
           )}
           {!loading && !error && products.length > 0 && (
             <div className="shop-product-grid">
-              {products.map((product, index) => (
+              {visibleProducts.map((product, index) => (
                 <ShopProductCard
                   go={go}
                   isFavorite={favoriteIds.includes(product.id)}
                   key={product.id}
                   onAddToCart={onAddToCart}
                   onToggleFavorite={toggleFavorite}
+                  favoritePending={favoritePendingIds.includes(product.id)}
                   product={product}
                   displayCurrency={displayCurrency}
                   exchangeRate={exchangeRate}
@@ -415,6 +469,7 @@ function ShopProductCard({
   displayCurrency,
   exchangeRate,
   styleDelay,
+  favoritePending,
 }: {
   go: (page: string) => void;
   isFavorite: boolean;
@@ -424,7 +479,9 @@ function ShopProductCard({
   displayCurrency: string;
   exchangeRate: number;
   styleDelay: number;
+  favoritePending: boolean;
 }) {
+  const reduceMotion = useReducedMotion();
   const salePrice = Number(product.sale_price_eur || 0);
   const saleAoa = salePrice * Number(exchangeRate || 0);
   const rentalPrice = Number(product.rental_price_per_day_eur || 0);
@@ -432,9 +489,12 @@ function ShopProductCard({
   const rentalAvailable = Boolean(product.rental_enabled && rentalPrice > 0);
 
   return (
-    <article
+    <motion.article
       className="shop-product-card"
-      style={{ animationDelay: `${styleDelay}ms` }}
+      initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+      transition={{ delay: styleDelay / 1000, duration: 0.42 }}
+      viewport={{ once: true, amount: 0.1 }}
+      whileInView={{ opacity: 1, y: 0 }}
     >
       <a
         className="shop-product-media"
@@ -442,7 +502,7 @@ function ShopProductCard({
         onClick={(event) => handleProductNav(event, product.slug, go)}
       >
         {product.image_url ? (
-          <img src={product.image_url} alt={product.name} />
+          <img loading="lazy" src={product.image_url} alt={product.name} />
         ) : (
           <ProductVisual tone={product.slug} />
         )}
@@ -457,13 +517,14 @@ function ShopProductCard({
       <button
         aria-label={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
         className={`favorite-pill ${isFavorite ? "active" : ""}`}
+        disabled={favoritePending}
         onClick={(event) => {
           event.stopPropagation();
           onToggleFavorite(product.id);
         }}
         type="button"
       >
-        coeur
+        <span aria-hidden="true">{isFavorite ? "♥" : "♡"}</span>
       </button>
       <div className="shop-product-body">
         <div className="shop-card-top">
@@ -526,7 +587,7 @@ function ShopProductCard({
           </a>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
