@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { appConfig } from "../../config/app";
 import { useLanguage } from "../../hooks/useLanguage";
 
@@ -258,7 +259,11 @@ export default function HomePage({
 
   return (
     <section className="home-page">
-      <HeroBanner displayCurrency={displayCurrency} go={go} />
+      <HeroBanner
+        displayCurrency={displayCurrency}
+        go={go}
+        product={featuredProducts[0] || latestProducts[0]}
+      />
       <CategoryShowcase go={go} />
       <ProductSection
         emptyText="Aucune nouveaute active n'est disponible dans la base."
@@ -317,7 +322,18 @@ export default function HomePage({
       <ReviewsHome reviews={reviews} />
       <AdvantagesBand />
       <NewsletterSection />
-      {error && <div className="home-error">{error}</div>}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            animate={{ opacity: 1, y: 0 }}
+            className="home-error"
+            exit={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0, y: 8 }}
+          >
+            {error}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
@@ -325,15 +341,24 @@ export default function HomePage({
 function HeroBanner({
   displayCurrency,
   go,
+  product,
 }: {
   displayCurrency: string;
   go: (page: string) => void;
+  product?: HomeProduct;
 }) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section className="home-hero-banner">
-      <div className="home-hero-copy">
+      <motion.div
+        animate={{ opacity: 1, y: 0 }}
+        className="home-hero-copy"
+        initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+      >
         <p className="eyebrow">Nouvelle collection</p>
-        <h1>Decouvrez la nouvelle collection</h1>
+        <h1>Le style qui traverse les frontieres</h1>
         <p>
           Robes, costumes, accessoires, location premium et cartes cadeaux pour
           connecter votre style entre l'Europe et l'Angola.
@@ -360,20 +385,30 @@ function HeroBanner({
             Decouvrir la collection
           </button>
         </div>
-      </div>
-      <div className="home-hero-visual" aria-label="Collection AK Fashion Plus">
-        <ProductVisual tone="hero-main-dress" />
-        <div>
-          <span>AK</span>
-          <strong>Printemps / Ete</strong>
-          <small>Shopping. Location. Revente.</small>
+      </motion.div>
+      <motion.div
+        animate={{ opacity: 1, scale: 1 }}
+        className="home-hero-visual"
+        initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
+        transition={{ delay: 0.12, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        aria-label="Collection AK Fashion Plus"
+      >
+        {product?.image_url ? (
+          <img src={product.image_url} alt={product.name} />
+        ) : (
+          <ProductVisual tone="hero-main-dress" />
+        )}
+        <div className="home-hero-mark">
+          <span>AK+</span>
+          <strong>Collection signature</strong>
+          <small>Shopping. Location. Seconde main.</small>
         </div>
         <aside>
           <strong>Selection du jour</strong>
-          <span>Robe satin bleu royal</span>
-          <small>Disponible achat et location</small>
+          <span>{product?.name || "Elegance contemporaine"}</span>
+          <small>{product?.category_name || "Disponible achat et location"}</small>
         </aside>
-      </div>
+      </motion.div>
     </section>
   );
 }
@@ -388,21 +423,30 @@ function CategoryShowcase({ go }: { go: (page: string) => void }) {
   ];
 
   return (
-    <section className="home-section">
+    <MotionSection className="home-section">
       <HomeTitle
         eyebrow="Categories principales"
         title="Accedez directement a vos univers"
       />
       <div className="home-category-grid">
         {categories.map(([title, text, page, tone]) => (
-          <button key={title} onClick={() => go(page)} type="button">
+          <motion.button
+            key={title}
+            onClick={() => go(page)}
+            type="button"
+            whileHover={{ y: -6 }}
+            whileTap={{ scale: 0.985 }}
+          >
             <ProductVisual tone={tone} />
-            <strong>{title}</strong>
-            <span>{text}</span>
-          </button>
+            <span className="home-category-copy">
+              <strong>{title}</strong>
+              <small>{text}</small>
+              <i aria-hidden="true">&rarr;</i>
+            </span>
+          </motion.button>
         ))}
       </div>
-    </section>
+    </MotionSection>
   );
 }
 
@@ -432,7 +476,7 @@ function ProductSection({
   title: string;
 }) {
   return (
-    <section className="home-section home-catalog-section">
+    <MotionSection className="home-section home-catalog-section">
       <HomeTitle eyebrow="Catalogue" title={title} subtitle={subtitle} />
       {loading && <HomeProductSkeleton />}
       {!loading && !products.length && (
@@ -455,7 +499,7 @@ function ProductSection({
           ))}
         </div>
       )}
-    </section>
+    </MotionSection>
   );
 }
 
@@ -485,38 +529,38 @@ function HomeProductCard({
   const rentalAvailable = Boolean(product.rental_enabled && rentalPrice > 0);
 
   return (
-    <article
+    <motion.article
       className="home-product-card"
-      style={{ animationDelay: `${styleDelay}ms` }}
+      initial={{ opacity: 0, y: 22 }}
+      transition={{ delay: styleDelay / 1000, duration: 0.45 }}
+      viewport={{ once: true, amount: 0.15 }}
+      whileInView={{ opacity: 1, y: 0 }}
     >
       <a
         href={`/products/${product.slug}`}
         onClick={(event) => handleNav(event, `product-${product.slug}`, go)}
       >
         {product.image_url ? (
-          <img src={product.image_url} alt={product.name} />
+          <img loading="lazy" src={product.image_url} alt={product.name} />
         ) : (
           <ProductVisual tone={product.slug} />
         )}
-        <button
-          aria-label={
-            isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"
-          }
-          className={isFavorite ? "active" : ""}
-          onClick={(event) => {
-            event.preventDefault();
-            onToggleFavorite(product.id);
-          }}
-          type="button"
-        >
-          coeur
-        </button>
         <span>{product.featured ? "Selection" : "Nouveau"}</span>
       </a>
+      <button
+        aria-label={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+        className={`home-favorite-button${isFavorite ? " active" : ""}`}
+        onClick={() => onToggleFavorite(product.id)}
+        type="button"
+      >
+        <span aria-hidden="true">{isFavorite ? "♥" : "♡"}</span>
+      </button>
       <div>
         <p>{product.category_name}</p>
         <h2>{product.name}</h2>
-        <small>{Number(product.average_rating || 0).toFixed(1)} / 5</small>
+        <small className="home-product-rating">
+          ★ {Number(product.average_rating || 0).toFixed(1)} / 5
+        </small>
         {saleAvailable && (
           <strong>
             {eur(salePrice)}
@@ -526,30 +570,32 @@ function HomeProductCard({
           </strong>
         )}
         {rentalAvailable && <small>Location {eur(rentalPrice)} / jour</small>}
-        <button
-          disabled={!saleAvailable}
-          onClick={(event) => {
-            event.stopPropagation();
-            onAddToCart(toCartProduct(product), "purchase");
-          }}
-          type="button"
-        >
-          Ajouter au panier
-        </button>
-        {rentalAvailable && (
+        <div className="home-product-actions">
           <button
-            className="gold"
+            disabled={!saleAvailable}
             onClick={(event) => {
               event.stopPropagation();
-              onAddToCart(toCartProduct(product), "rental");
+              onAddToCart(toCartProduct(product), "purchase");
             }}
             type="button"
           >
-            Louer
+            Ajouter au panier
           </button>
-        )}
+          {rentalAvailable && (
+            <button
+              className="gold"
+              onClick={(event) => {
+                event.stopPropagation();
+                onAddToCart(toCartProduct(product), "rental");
+              }}
+              type="button"
+            >
+              Louer
+            </button>
+          )}
+        </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -919,6 +965,28 @@ function HomeTitle({
       <h2>{title}</h2>
       {subtitle && <span>{subtitle}</span>}
     </div>
+  );
+}
+
+function MotionSection({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className: string;
+}) {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <motion.section
+      className={className}
+      initial={reduceMotion ? false : { opacity: 0, y: 30 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once: true, amount: 0.12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+    >
+      {children}
+    </motion.section>
   );
 }
 
