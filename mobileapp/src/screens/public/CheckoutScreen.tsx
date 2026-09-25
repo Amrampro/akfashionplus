@@ -547,7 +547,7 @@ export default function CheckoutScreen({ onBack, onSuccess, onFailure }: Props) 
               <Text style={styles.resaleText}>
                 {t("checkoutPage.resalePrefix")}{" "}
                 <Text style={styles.resaleAmount}>
-                  {formatSecondary(resaleValue, currencyLabel, locale)}
+                  {formatSecondary(resaleValue, "Kwanza", locale)}
                 </Text>
                 .
               </Text>

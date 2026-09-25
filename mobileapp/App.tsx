@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { StripeProvider } from "@stripe/stripe-react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import MobileBottomNavigation, {
   MobileTab,
 } from "./src/components/MobileBottomNavigation";
@@ -474,22 +475,24 @@ function AppShell() {
 
 export default function App() {
   return (
-    <StripeProvider
-      publishableKey={appConfig.stripePublishableKey}
-      merchantIdentifier="merchant.com.akfashionplus.mobile"
-      urlScheme="akfashionplus"
-    >
-      <LanguageProvider>
-        <AuthProvider>
-          <UserLanguageSync />
-          <CartProvider>
-            <FavoritesProvider>
-              <AppShell />
-            </FavoritesProvider>
-          </CartProvider>
-        </AuthProvider>
-      </LanguageProvider>
-    </StripeProvider>
+    <SafeAreaProvider>
+      <StripeProvider
+        publishableKey={appConfig.stripePublishableKey}
+        merchantIdentifier="merchant.com.akfashionplus.mobile"
+        urlScheme="akfashionplus"
+      >
+        <LanguageProvider>
+          <AuthProvider>
+            <UserLanguageSync />
+            <CartProvider>
+              <FavoritesProvider>
+                <AppShell />
+              </FavoritesProvider>
+            </CartProvider>
+          </AuthProvider>
+        </LanguageProvider>
+      </StripeProvider>
+    </SafeAreaProvider>
   );
 }
 

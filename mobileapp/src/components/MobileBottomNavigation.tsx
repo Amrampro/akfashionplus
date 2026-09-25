@@ -1,4 +1,5 @@
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { theme } from "../config/theme";
 import { useLanguage } from "../hooks/useLanguage";
 
@@ -88,9 +89,15 @@ export default function MobileBottomNavigation({
   onChange,
 }: Props) {
   const { t } = useLanguage();
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.bottomBar}>
+    <View
+      style={[
+        styles.bottomBar,
+        { paddingBottom: Math.max(insets.bottom, Platform.OS === "ios" ? 22 : 12) },
+      ]}
+    >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         const badgeCount =
@@ -133,7 +140,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: theme.colors.line,
     backgroundColor: "#FFF",
-    paddingBottom: Platform.OS === "ios" ? 22 : 10,
     paddingTop: 8,
     paddingHorizontal: 8,
   },

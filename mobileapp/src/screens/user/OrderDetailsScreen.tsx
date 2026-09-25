@@ -441,9 +441,14 @@ export default function OrderDetailsScreen({ orderId, onBack }: Props) {
                   <Text style={styles.body}>
                     {t("orderDetails.resaleText")}
                   </Text>
-                  <Text style={styles.resaleValue}>
-                    {formatKwanza(resaleAmount(order), locale)}
-                  </Text>
+                  <View style={styles.resaleValues}>
+                    <Text style={styles.resaleValueEur}>
+                      {formatEur(numeric(order.total_eur), locale)}
+                    </Text>
+                    <Text style={styles.resaleValue}>
+                      {formatKwanza(resaleAmount(order), locale)}
+                    </Text>
+                  </View>
                 </View>
               ) : null}
 
@@ -655,6 +660,8 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 8,
   },
+  resaleValues: { gap: 3 },
+  resaleValueEur: { color: "#071846", fontSize: 25, fontWeight: "900" },
   resaleValue: { color: "#071846", fontSize: 22, fontWeight: "900" },
   itemRow: {
     flexDirection: "row",
