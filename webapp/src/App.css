@@ -3657,6 +3657,37 @@ textarea:focus {
   gap: 10px;
 }
 
+.auth-password-field {
+  position: relative;
+  min-width: 0;
+}
+
+.auth-password-field input {
+  width: 100%;
+  padding-right: 52px;
+}
+
+.auth-password-field .auth-password-toggle {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  bottom: 2px;
+  width: 44px;
+  min-height: 42px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: #0b1845;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.auth-password-toggle:focus-visible {
+  outline: 2px solid #0b1845;
+  outline-offset: -3px;
+}
+
 .auth-form > button[type="submit"] {
   min-height: 48px;
 }

@@ -6,6 +6,7 @@ import {
   type MouseEvent,
 } from "react";
 import { useLanguage } from "./hooks/useLanguage";
+import { Eye, EyeOff } from "lucide-react";
 import ContactPage from "./pages/public/ContactPage";
 import PasswordResetPage from "./pages/public/PasswordResetPage";
 import { absoluteImageUrl } from "./utils/images";
@@ -827,6 +828,7 @@ function App() {
           go={go}
           login={login}
           mode="login"
+          key="login"
           registerAccount={registerAccount}
         />
       );
@@ -839,6 +841,7 @@ function App() {
           go={go}
           login={login}
           mode="register"
+          key="register"
           registerAccount={registerAccount}
         />
       );
@@ -2292,6 +2295,14 @@ function AuthPage({
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [visiblePasswordMode, setVisiblePasswordMode] = useState<string | null>(null);
+  const passwordVisible = visiblePasswordMode === mode;
+  const { language } = useLanguage();
+  const passwordCopy = {
+    fr: { label: "Mot de passe", show: "Afficher le mot de passe", hide: "Masquer le mot de passe" },
+    en: { label: "Password", show: "Show password", hide: "Hide password" },
+    pt: { label: "Palavra-passe", show: "Mostrar palavra-passe", hide: "Ocultar palavra-passe" },
+  }[language];
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
@@ -2392,13 +2403,28 @@ function AuthPage({
             value={email}
           />
         </label>
-        <input
-          autoComplete={isLogin ? "current-password" : "new-password"}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="Mot de passe"
-          type="password"
-          value={password}
-        />
+        <label htmlFor={`auth-password-${mode}`}>{passwordCopy.label}</label>
+        <div className="auth-password-field">
+          <input
+            id={`auth-password-${mode}`}
+            autoComplete={isLogin ? "current-password" : "new-password"}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder={passwordCopy.label}
+            type={passwordVisible ? "text" : "password"}
+            value={password}
+          />
+          <button
+            type="button"
+            className="auth-password-toggle"
+            aria-label={passwordVisible ? passwordCopy.hide : passwordCopy.show}
+            title={passwordVisible ? passwordCopy.hide : passwordCopy.show}
+            aria-controls={`auth-password-${mode}`}
+            aria-pressed={passwordVisible}
+            onClick={() => setVisiblePasswordMode(passwordVisible ? null : mode)}
+          >
+            {passwordVisible ? <EyeOff size={20} aria-hidden="true" /> : <Eye size={20} aria-hidden="true" />}
+          </button>
+        </div>
         {!isLogin && (
           <label>
             Telephone
