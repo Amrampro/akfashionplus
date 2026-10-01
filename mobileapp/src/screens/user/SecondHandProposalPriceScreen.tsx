@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Platform,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   StatusBar as NativeStatusBar,
   Text,
@@ -13,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { theme } from "../../config/theme";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useLanguage } from "../../hooks/useLanguage";
 import {
   createSecondHandProposal,
@@ -69,7 +69,7 @@ export default function SecondHandProposalPriceScreen({ form, photos, onBack, on
   return (
     <SafeAreaView style={styles.safe}>
       <ExpoStatusBar style="dark" />
-      <ScrollView contentContainerStyle={styles.content}>
+      <KeyboardAwareScrollView bottomOffset={32} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.content, { paddingBottom: 100 }]}>
         <View style={styles.topbar}>
           <TouchableOpacity style={styles.backButton} onPress={onBack}>
             <Text style={styles.backText}>‹</Text>
@@ -127,7 +127,7 @@ export default function SecondHandProposalPriceScreen({ form, photos, onBack, on
             )}
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

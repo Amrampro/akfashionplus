@@ -463,7 +463,7 @@ function GiftCardVisual({
       <div className="giftcard-meta-row">
         <div>
           <small>Titulaire</small>
-          <strong>Ana Kiala</strong>
+          <strong>Alfredo Kavula</strong>
         </div>
         <div>
           <small>Expire le</small>

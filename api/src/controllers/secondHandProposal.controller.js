@@ -1,3 +1,4 @@
+import { uploadUrl } from "../utils/publicUrls.js";
 import { created, fail, ok } from "../utils/apiResponse.js";
 import { writeAudit } from "../services/audit.service.js";
 import { notifyUser } from "../services/notification.service.js";
@@ -82,7 +83,7 @@ async function uniqueProposalNumber() {
 }
 
 function publicImageUrl(req, file) {
-  return `${req.protocol}://${req.get("host")}/uploads/second-hand-proposals/${file.filename}`;
+  return uploadUrl(req, "second-hand-proposals", file.filename);
 }
 
 async function hydrate(proposal, user) {

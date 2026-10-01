@@ -1,3 +1,5 @@
+import { useState, type FormEvent } from "react";
+import { post } from "../../services/api";
 type Language = "fr" | "en" | "pt";
 
 const contactCopy = {
@@ -89,6 +91,21 @@ export default function ContactPage({
   language: Language;
 }) {
   const copy = contactCopy[language];
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState("");
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    setBusy(true);
+    setNotice("");
+    try {
+      await post("/contact", Object.fromEntries(new FormData(form)));
+      form.reset();
+      setNotice({ fr: "Votre message a ete envoye.", en: "Your message was sent.", pt: "A sua mensagem foi enviada." }[language]);
+    } catch {
+      setNotice({ fr: "Envoi impossible. Reessayez plus tard.", en: "Unable to send. Please try again later.", pt: "Nao foi possivel enviar. Tente mais tarde." }[language]);
+    } finally { setBusy(false); }
+  }
 
   return (
     <section className="info-page contact-page">
@@ -101,19 +118,19 @@ export default function ContactPage({
       <section className="contact-layout">
         <form
           className="contact-form"
-          onSubmit={(event) => event.preventDefault()}
+          onSubmit={submit}
         >
           <div>
             <label htmlFor="contact-name">{copy.name}</label>
-            <input id="contact-name" placeholder={copy.namePlaceholder} />
+            <input id="contact-name" name="name" maxLength={150} required placeholder={copy.namePlaceholder} />
           </div>
           <div>
             <label htmlFor="contact-email">{copy.email}</label>
-            <input id="contact-email" placeholder="exemple@email.com" />
+            <input id="contact-email" name="email" type="email" maxLength={255} required placeholder="exemple@email.com" />
           </div>
           <div>
             <label htmlFor="contact-subject">{copy.subject}</label>
-            <select id="contact-subject" defaultValue={copy.subjects[0]}>
+            <select id="contact-subject" name="subject" defaultValue={copy.subjects[0]}>
               {copy.subjects.map((subject) => (
                 <option key={subject} value={subject}>
                   {subject}
@@ -125,11 +142,15 @@ export default function ContactPage({
             <label htmlFor="contact-message">{copy.message}</label>
             <textarea
               id="contact-message"
+              name="message"
+              required
+              maxLength={10000}
               placeholder={copy.messagePlaceholder}
               rows={6}
             />
           </div>
-          <button type="submit">{copy.submit}</button>
+          {notice && <p role="status">{notice}</p>}
+          <button type="submit" disabled={busy}>{busy ? "..." : copy.submit}</button>
         </form>
 
         <aside className="contact-panel">

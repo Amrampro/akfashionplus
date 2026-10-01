@@ -22,10 +22,26 @@ import secondHandProposalRoutes from "./secondHandProposal.routes.js";
 import settingRoutes from "./setting.routes.js";
 import userRoutes from "./user.routes.js";
 import { query } from "../config/database.js";
-import { ok } from "../utils/apiResponse.js";
+import { ok, fail } from "../utils/apiResponse.js";
+import { sendEmail } from "../services/email.service.js";
+import { rateLimit } from "express-rate-limit";
 import { listGiftCardTypes } from "../controllers/giftCard.controller.js";
 
 const router = express.Router();
+router.post("/contact", rateLimit({ windowMs: 15 * 60 * 1000, limit: 5 }), async (req, res) => {
+  const { name, email, subject, message } = req.body;
+  if (![name, email, subject, message].every((v) => typeof v === "string" && v.trim()) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255 ||
+      name.length > 150 || subject.length > 150 || message.length > 10000) return fail(res, 422, "Invalid contact form");
+  try {
+    await sendEmail({ to: "support@akfashionplus.com", replyTo: email,
+      subject: `Contact AKFashionPlus: ${subject.replace(/[\r\n]/g, " ")}`,
+      text: `${name}\n${email}\n\n${message}` });
+    return ok(res, null, "Message sent");
+  } catch {
+    return fail(res, 503, "Email unavailable. Please try again later.");
+  }
+});
 
 router.get("/health", async (_req, res) => {
   await query("SELECT 1 AS ok");

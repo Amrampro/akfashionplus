@@ -1,3 +1,4 @@
+import { uploadUrl } from "../utils/publicUrls.js";
 import { transaction } from "../config/database.js";
 import * as Product from "../models/product.model.js";
 import { created, fail, ok } from "../utils/apiResponse.js";
@@ -312,7 +313,7 @@ export async function uploadProductImage(req, res) {
     return fail(res, 422, "Image file is required");
   }
 
-  const imageUrl = `${req.protocol}://${req.get("host")}/uploads/products/${req.file.filename}`;
+  const imageUrl = uploadUrl(req, "products", req.file.filename);
   const result = await Product.createImage(req.params.productId, {
     image_url: imageUrl,
     alt_text: req.body.alt_text || null,

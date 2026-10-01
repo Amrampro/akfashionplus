@@ -15,6 +15,7 @@ import {
 import { theme } from "../../config/theme";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getOrder } from "../../services/order.service";
+import { downloadOrderReceipt } from "../../services/receipt.service";
 import { absoluteImageUrl } from "../../utils/images";
 
 type Props = {
@@ -309,7 +310,15 @@ function SummaryLine({
 }
 
 export default function OrderDetailsScreen({ orderId, onBack }: Props) {
-  const { locale, t } = useLanguage();
+  const { locale, t, language } = useLanguage();
+  const [downloading, setDownloading] = useState(false);
+  const receiptLabel = { fr: "Telecharger le recu PDF", en: "Download PDF receipt", pt: "Descarregar recibo PDF" }[language];
+  async function downloadReceipt() {
+    setDownloading(true);
+    try { await downloadOrderReceipt(Number(orderId)); }
+    catch { setError({ fr: "Impossible de telecharger le recu.", en: "Unable to download receipt.", pt: "Nao foi possivel descarregar o recibo." }[language]); }
+    finally { setDownloading(false); }
+  }
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -374,6 +383,9 @@ export default function OrderDetailsScreen({ orderId, onBack }: Props) {
 
           {order && !loading ? (
             <>
+              <TouchableOpacity onPress={downloadReceipt} disabled={downloading} style={styles.centerCard}>
+                <Text style={styles.body}>{downloading ? "..." : receiptLabel}</Text>
+              </TouchableOpacity>
               <View style={styles.summaryCard}>
                 <View style={styles.summaryTop}>
                   <View>
@@ -394,11 +406,12 @@ export default function OrderDetailsScreen({ orderId, onBack }: Props) {
                   </View>
                   <TouchableOpacity
                     accessibilityRole="button"
-                    accessibilityLabel={t("orderDetails.share")}
-                    onPress={() => undefined}
+                    accessibilityLabel={receiptLabel}
+                    disabled={downloading}
+                    onPress={downloadReceipt}
                     style={styles.shareButton}
                   >
-                    <Text style={styles.shareText}>↗</Text>
+                    <Text style={styles.shareText}>{downloading ? "..." : "↓"}</Text>
                   </TouchableOpacity>
                 </View>
                 <SummaryLine

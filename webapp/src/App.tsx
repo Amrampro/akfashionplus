@@ -7,6 +7,8 @@ import {
 } from "react";
 import { useLanguage } from "./hooks/useLanguage";
 import ContactPage from "./pages/public/ContactPage";
+import PasswordResetPage from "./pages/public/PasswordResetPage";
+import { absoluteImageUrl } from "./utils/images";
 import FaqPage from "./pages/public/FaqPage";
 import GiftCardsPage from "./pages/public/GiftCardsPage";
 import HomePage from "./pages/public/HomePage";
@@ -139,6 +141,8 @@ const routes: Record<string, string> = {
   "order-success": "/order-success",
   "order-failure": "/order-failure",
   login: "/login",
+  "forgot-password": "/forgot-password",
+  "reset-password": "/reset-password",
   register: "/register",
   "user-dashboard": "/account",
   "user-orders": "/account/orders",
@@ -701,6 +705,7 @@ function App() {
   );
 
   function renderPage() {
+    if (page === "forgot-password" || page === "reset-password") return <PasswordResetPage reset={page === "reset-password"} language={language} />;
     const requiredRole = workspaceRoleForPage(page);
     const isAuthenticated = authChecked && Boolean(session && hasStoredAuthToken());
 
@@ -1190,7 +1195,7 @@ function ImportantLinkViewer({
             {error || text("Document introuvable.")}
           </div>
         ) : (
-          <iframe src={link.pdf_url} title={link.title} />
+          <a href={absoluteImageUrl(link.pdf_url)} target="_blank" rel="noopener noreferrer">{link.title} (PDF)</a>
         )}
       </div>
     </section>
@@ -1561,7 +1566,7 @@ function CheckoutPage({
   setSession: (session: Session | null) => void;
 }) {
   const { language } = useLanguage();
-  const [beneficiaryName, setBeneficiaryName] = useState("Ana Kiala");
+  const [beneficiaryName, setBeneficiaryName] = useState("Alfredo Kavula");
   const [beneficiaryPhone, setBeneficiaryPhone] = useState("+244 912 345 678");
   const [address, setAddress] = useState("Rua Rainha Ginga, No 23");
   const [fulfillmentType, setFulfillmentType] = useState<"delivery" | "pickup">(
@@ -2363,7 +2368,7 @@ function AuthPage({
               Prenom
               <input
                 onChange={(event) => setFirstName(event.target.value)}
-                placeholder="Ana"
+                placeholder="Alfredo"
                 value={firstName}
               />
             </label>
@@ -2371,7 +2376,7 @@ function AuthPage({
               Nom
               <input
                 onChange={(event) => setLastName(event.target.value)}
-                placeholder="Kiala"
+                placeholder="Kavula"
                 value={lastName}
               />
             </label>
@@ -2418,7 +2423,7 @@ function AuthPage({
           >
             {isLogin ? "Creer un compte" : "J'ai deja un compte"}
           </button>
-          {isLogin && <button type="button">Mot de passe oublie ?</button>}
+          {isLogin && <button type="button" onClick={() => go("forgot-password")}>Mot de passe oublie ?</button>}
         </div>
         {(localMessage || authMessage) && (
           <p className={localMessage ? "notice error" : "notice"}>
@@ -2755,11 +2760,10 @@ function Footer({
           <h2>{text("Liens importants")}</h2>
           {importantLinks.map((link) => (
             <a
-              href={`/important-links/${link.slug}`}
+              href={absoluteImageUrl(link.pdf_url)}
               key={link.id}
-              onClick={(event) =>
-                handleNav(event, `important-link-${link.slug}`, go)
-              }
+              target="_blank"
+              rel="noopener noreferrer"
             >
               {link.title}
             </a>

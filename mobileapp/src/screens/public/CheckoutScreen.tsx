@@ -172,7 +172,7 @@ export default function CheckoutScreen({ onBack, onSuccess, onFailure }: Props) 
   const { items, subtotal, clearCart } = useCart();
   const { language, locale, t } = useLanguage();
   const [settings, setSettings] = useState<SettingsPayload>({});
-  const [beneficiaryName, setBeneficiaryName] = useState("Ana Kiala");
+  const [beneficiaryName, setBeneficiaryName] = useState("Alfredo Kavula");
   const [beneficiaryPhone, setBeneficiaryPhone] = useState("+244 912 345 678");
   const [address, setAddress] = useState("Rua Rainha Ginga, No 23");
   const [fulfillment, setFulfillment] = useState<"delivery" | "pickup">("delivery");

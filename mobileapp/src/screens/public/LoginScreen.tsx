@@ -2,6 +2,7 @@ import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
   ActivityIndicator,
+  Linking,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -14,6 +15,7 @@ import {
   View,
 } from "react-native";
 import { theme } from "../../config/theme";
+import { appConfig } from "../../config/app";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -35,7 +37,7 @@ function EyeIcon({ open }: { open: boolean }) {
 
 export default function LoginScreen({ onSuccess, onRegister }: Props) {
   const { loginWithCredentials } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -138,6 +140,9 @@ export default function LoginScreen({ onSuccess, onRegister }: Props) {
 
             <TouchableOpacity style={styles.secondaryButton} onPress={onRegister}>
               <Text style={styles.secondaryButtonText}>{t("common.register")}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.secondaryButton} onPress={() => Linking.openURL(`${appConfig.webUrl}/forgot-password`).catch(() => setError(t("loginPage.errorFallback")))}>
+              <Text style={styles.secondaryButtonText}>{{ fr: "Mot de passe oublie ?", en: "Forgot password?", pt: "Esqueceu a palavra-passe?" }[language]}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

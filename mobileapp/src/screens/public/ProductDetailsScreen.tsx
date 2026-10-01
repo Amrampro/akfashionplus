@@ -23,6 +23,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useFavorites } from "../../hooks/useFavorites";
 import { get, post } from "../../services/api";
 import { absoluteImageUrl } from "../../utils/images";
+import ZoomableImage from "../../components/ZoomableImage";
 
 type ProductSummary = {
   id: number;
@@ -129,7 +130,7 @@ function ProductVisual({
 }) {
   const uri = absoluteImageUrl(image?.image_url || product.image_url);
   if (uri) {
-    return <Image source={{ uri }} style={styles.mainImage} />;
+    return <ZoomableImage uri={uri} style={styles.mainImage} />;
   }
   return (
     <View style={styles.mainImagePlaceholder}>

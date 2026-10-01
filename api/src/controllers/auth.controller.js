@@ -1,4 +1,7 @@
-import { query } from "../config/database.js";
+import { query, transaction } from "../config/database.js";
+import { randomBytes, createHash } from "node:crypto";
+import { sendEmail } from "../services/email.service.js";
+import { websiteUrl } from "../utils/publicUrls.js";
 import { created, fail, ok } from "../utils/apiResponse.js";
 import { signToken } from "../utils/jwt.js";
 import { hashPassword, verifyPassword } from "../utils/password.js";
@@ -193,26 +196,46 @@ export async function changePassword(req, res) {
 export async function forgotPassword(req, res) {
   const email = normalizeEmail(req.body.email);
 
-  if (email) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) return fail(res, 422, "Invalid email");
+  if (!process.env.SMTP_HOST) return fail(res, 503, "Email service unavailable");
+  const users = await query("SELECT id FROM users WHERE email = :email AND status = 'active'", { email });
+  if (users.length) {
+    const token = randomBytes(32).toString("hex");
+    const token_hash = createHash("sha256").update(token).digest("hex");
     await query(
-      `INSERT INTO notifications (user_id, type, title, message)
-       SELECT id, 'password_reset', 'Password reset requested',
-       'A password reset was requested for your account.'
-       FROM users
-       WHERE email = :email`,
-      { email },
+      `INSERT INTO password_reset_tokens (email, token_hash, expires_at)
+       VALUES (:email, :token_hash, DATE_ADD(NOW(), INTERVAL 30 MINUTE))
+       ON DUPLICATE KEY UPDATE token_hash = VALUES(token_hash), expires_at = VALUES(expires_at)`,
+      { email, token_hash },
     );
+    const link = `${websiteUrl()}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+    try {
+      await sendEmail({ to: email, subject: "AKFashionPlus - Password / Mot de passe / Palavra-passe",
+        text: `Reinitialisez votre mot de passe / Reset your password / Redefina a sua palavra-passe:\n\n${link}\n\nCe lien expire dans 30 minutes. / This link expires in 30 minutes. / Este link expira em 30 minutos.\nIgnorez ce message si vous n'avez pas fait cette demande.` });
+    } catch {
+      console.error("Password reset email could not be delivered");
+      await query("DELETE FROM password_reset_tokens WHERE email = :email AND token_hash = :token_hash", { email, token_hash });
+    }
   }
 
   return ok(res, null, "If the email exists, reset instructions will be sent");
 }
 
-export async function resetPassword(_req, res) {
-  return fail(
-    res,
-    501,
-    "Password reset tokens require an email provider configuration",
-  );
+export async function resetPassword(req, res) {
+  const { token, password, password_confirmation } = req.body;
+  const email = normalizeEmail(req.body.email);
+  if (typeof password !== "string" || password.length < 8 || password.length > 256 || password !== password_confirmation || typeof token !== "string" || !/^[a-f0-9]{64}$/.test(token) || email.length > 255) {
+    return fail(res, 422, "Invalid link or passwords (minimum 8 characters)");
+  }
+  const token_hash = createHash("sha256").update(token).digest("hex");
+  const updated = await transaction(async (connection) => {
+    const [rows] = await connection.execute("SELECT email FROM password_reset_tokens WHERE email = :email AND token_hash = :token_hash AND expires_at > NOW() FOR UPDATE", { email, token_hash });
+    if (!rows.length) return false;
+    await connection.execute("UPDATE users SET password_hash = :password_hash WHERE email = :email AND status = 'active'", { email, password_hash: hashPassword(password) });
+    await connection.execute("DELETE FROM password_reset_tokens WHERE email = :email", { email });
+    return true;
+  });
+  return updated ? ok(res, null, "Password updated") : fail(res, 422, "Invalid or expired reset link");
 }
 
 export async function logout(_req, res) {

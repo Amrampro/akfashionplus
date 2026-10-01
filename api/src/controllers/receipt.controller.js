@@ -72,16 +72,19 @@ async function orderReceipt(orderId) {
   return {
     filename: `recu-commande-${order.order_number}.pdf`,
     title: "Recu AK Fashion Plus - Commande",
+    status: order.payment_status,
     lines: [
       `Reference: ${order.order_number}`,
       `Type: ${mode}`,
       `Client: ${order.customer_name} - ${order.customer_email}`,
       `Beneficiaire: ${order.beneficiary_name || "-"} - ${order.beneficiary_phone || "-"}`,
+      `Adresse: ${[order.shipping_address_line_1, order.shipping_address_line_2, order.shipping_city, order.shipping_postal_code, order.shipping_country_code].filter(Boolean).join(", ") || "-"}`,
       `Guichet: ${order.branch_name || "-"} ${order.branch_city || ""}`,
       `Date: ${date(order.created_at)}`,
       `Paiement: ${order.payment_status || "-"} / Statut: ${order.status || "-"}`,
       `Sous-total: ${eur(order.subtotal_eur)}`,
       `Livraison: ${eur(order.shipping_total_eur)}`,
+      `Remise: ${eur(order.discount_total_eur)}`,
       `Total: ${eur(order.total_eur)} - ${aoa(order.total_aoa, currency)}`,
       "",
       "Articles",
@@ -126,6 +129,7 @@ async function rentalReceipt(orderItemId) {
   return {
     filename: `recu-location-${rental.order_number}-${rental.id}.pdf`,
     title: "Recu AK Fashion Plus - Location",
+    status: rental.payment_status,
     lines: [
       `Reference: ${rental.order_number}`,
       "Type: Location article",
@@ -173,6 +177,7 @@ async function resaleReceipt(resaleId) {
   return {
     filename: `recu-revente-${resale.order_number}-${resale.id}.pdf`,
     title: "Recu AK Fashion Plus - Revente",
+    status: resale.status,
     lines: [
       `Reference: ${resale.order_number}`,
       "Type: Retrait argent revente AK",
@@ -194,13 +199,15 @@ async function resaleReceipt(resaleId) {
 }
 
 export async function downloadReceipt(req, res) {
-  if (!staffOnly(req, res)) return;
-
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
     return fail(res, 422, "Invalid receipt id");
   }
 
+  if (req.user.role === "user" && req.params.type === "order") {
+    const owned = await query("SELECT id FROM orders WHERE id = :id AND user_id = :user_id", { id, user_id: req.user.id });
+    if (!owned.length) return fail(res, 404, "Receipt not found");
+  } else if (!staffOnly(req, res)) return;
   const builders = {
     order: orderReceipt,
     rental: rentalReceipt,

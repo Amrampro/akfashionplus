@@ -41,6 +41,7 @@ module.exports = {
 
   extra: {
     ...(appJson.expo.extra || {}),
+    webUrl: process.env.EXPO_PUBLIC_WEB_URL || env.EXPO_PUBLIC_WEB_URL || "https://akfashionplus.com",
 
     apiUrl:
       process.env.EXPO_PUBLIC_API_URL ||

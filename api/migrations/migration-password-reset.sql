@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  email VARCHAR(255) NOT NULL PRIMARY KEY,
+  token_hash CHAR(64) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

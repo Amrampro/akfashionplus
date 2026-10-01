@@ -1,5 +1,7 @@
+import { uploadUrl } from "../utils/publicUrls.js";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { query } from "../config/database.js";
 import { created, fail, ok } from "../utils/apiResponse.js";
 
@@ -30,15 +32,15 @@ async function uniqueSlug(title, id = null) {
 }
 
 function publicUrl(req, file) {
-  return `${req.protocol}://${req.get("host")}/uploads/important-links/${file.filename}`;
+  return uploadUrl(req, "important-links", file.filename);
 }
 
 function unlinkUploadedFile(fileUrl) {
   if (!fileUrl) return;
   try {
     const filename = path.basename(new URL(fileUrl).pathname);
-    const target = path.resolve("uploads/important-links", filename);
-    const root = path.resolve("uploads/important-links");
+    const root = fileURLToPath(new URL("../../uploads/important-links/", import.meta.url));
+    const target = path.resolve(root, filename);
     if (target.startsWith(root) && fs.existsSync(target)) {
       fs.unlinkSync(target);
     }

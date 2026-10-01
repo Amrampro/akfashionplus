@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { theme } from "../../config/theme";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useLanguage } from "../../hooks/useLanguage";
 import { getCategories } from "../../services/category.service";
 import type { SecondHandConditionState, SecondHandProposalForm } from "../../types";
@@ -109,7 +110,7 @@ export default function SecondHandProposalFormScreen({ onBack, onContinue }: Pro
   return (
     <SafeAreaView style={styles.safe}>
       <ExpoStatusBar style="dark" />
-      <ScrollView contentContainerStyle={styles.content}>
+      <KeyboardAwareScrollView bottomOffset={32} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.content, { paddingBottom: 100 }]}>
         <View style={styles.topbar}>
           <TouchableOpacity style={styles.backButton} onPress={onBack}>
             <Text style={styles.backText}>‹</Text>
@@ -243,7 +244,7 @@ export default function SecondHandProposalFormScreen({ onBack, onContinue }: Pro
             <Text style={styles.primaryText}>{t("secondHand.continue")}</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

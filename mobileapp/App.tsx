@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { StripeProvider } from "@stripe/stripe-react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import MobileBottomNavigation, {
   MobileTab,
 } from "./src/components/MobileBottomNavigation";
@@ -476,6 +477,7 @@ function AppShell() {
 export default function App() {
   return (
     <SafeAreaProvider>
+      <KeyboardProvider>
       <StripeProvider
         publishableKey={appConfig.stripePublishableKey}
         merchantIdentifier="merchant.com.akfashionplus.mobile"
@@ -492,6 +494,7 @@ export default function App() {
           </AuthProvider>
         </LanguageProvider>
       </StripeProvider>
+      </KeyboardProvider>
     </SafeAreaProvider>
   );
 }

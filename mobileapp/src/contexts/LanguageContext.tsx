@@ -31,7 +31,7 @@ const localeByLanguage: Record<Language, string> = {
 };
 
 export function normalizeLanguage(language?: Language | string | null): Language {
-  if (language === "en" || language === "pt") return language;
+  if (language === "fr" || language === "en" || language === "pt") return language;
   return "pt";
 }
 

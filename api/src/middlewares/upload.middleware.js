@@ -1,6 +1,7 @@
 import multer from "multer";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const storage = multer.diskStorage({
   destination: (_req, file, cb) => {
@@ -17,8 +18,9 @@ const storage = multer.diskStorage({
               : file.fieldname === "important_link_pdf"
                 ? "uploads/important-links"
                 : "uploads/products";
-    fs.mkdirSync(destination, { recursive: true });
-    cb(null, destination);
+    const absolute = fileURLToPath(new URL(`../../${destination}/`, import.meta.url));
+    fs.mkdirSync(absolute, { recursive: true });
+    cb(null, absolute);
   },
   filename: (_req, file, cb) =>
     cb(

@@ -1,3 +1,4 @@
+import { uploadUrl } from "../utils/publicUrls.js";
 import { created, fail, ok } from "../utils/apiResponse.js";
 import * as Category from "../models/category.model.js";
 
@@ -107,7 +108,7 @@ export async function uploadCategoryImage(req, res) {
     return fail(res, 404, "Category not found");
   }
 
-  const imageUrl = `${req.protocol}://${req.get("host")}/uploads/categories/${req.file.filename}`;
+  const imageUrl = uploadUrl(req, "categories", req.file.filename);
   await Category.updateCategory(req.params.id, { image_url: imageUrl });
 
   return ok(res, { image_url: imageUrl }, "Category image uploaded");

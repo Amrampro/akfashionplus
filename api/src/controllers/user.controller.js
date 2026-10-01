@@ -1,3 +1,4 @@
+import { uploadUrl } from "../utils/publicUrls.js";
 import { created, fail, ok } from "../utils/apiResponse.js";
 import { hashPassword } from "../utils/password.js";
 import * as User from "../models/user.model.js";
@@ -62,7 +63,7 @@ export async function uploadProfileAvatar(req, res) {
     return fail(res, 422, "Avatar image is required");
   }
 
-  const avatarUrl = `${req.protocol}://${req.get("host")}/uploads/avatars/${req.file.filename}`;
+  const avatarUrl = uploadUrl(req, "avatars", req.file.filename);
   await User.updateUser(req.user.id, { avatar_url: avatarUrl });
   const user = await User.ensureReferralCode(await User.findUserById(req.user.id));
   return ok(res, sanitizeUser(user), "Avatar uploaded");

@@ -1,4 +1,5 @@
 import express from "express";
+import { rateLimit } from "express-rate-limit";
 import {
   changePassword,
   forgotPassword,
@@ -16,8 +17,9 @@ router.post("/register", register);
 router.post("/login", login);
 router.get("/me", requireAuth, me);
 router.post("/change-password", requireAuth, changePassword);
-router.post("/forgot-password", forgotPassword);
-router.post("/reset-password", resetPassword);
+const resetLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10 });
+router.post("/forgot-password", resetLimit, forgotPassword);
+router.post("/reset-password", resetLimit, resetPassword);
 router.post("/logout", requireAuth, logout);
 
 export default router;

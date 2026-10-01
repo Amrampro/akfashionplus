@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "AK Fashion Plus",
+    "name": "AKFashionPlus",
     "slug": "ak-fashion-plus",
     "scheme": "akfashionplus",
     "version": "1.0.0",
@@ -22,6 +22,7 @@
     },
 
     "android": {
+      "softwareKeyboardLayoutMode": "resize",
       "package": "com.akfashionplus.app",
       "versionCode": 1,
 
