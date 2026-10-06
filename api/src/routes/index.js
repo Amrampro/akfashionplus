@@ -35,7 +35,7 @@ router.post("/contact", rateLimit({ windowMs: 15 * 60 * 1000, limit: 5 }), async
       name.length > 150 || subject.length > 150 || message.length > 10000) return fail(res, 422, "Invalid contact form");
   try {
     await sendEmail({ to: "support@akfashionplus.com", replyTo: email,
-      subject: `Contact AKFashionPlus: ${subject.replace(/[\r\n]/g, " ")}`,
+      subject: `Contact AK Fashion Plus: ${subject.replace(/[\r\n]/g, " ")}`,
       text: `${name}\n${email}\n\n${message}` });
     return ok(res, null, "Message sent");
   } catch {

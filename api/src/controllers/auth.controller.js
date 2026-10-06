@@ -210,7 +210,7 @@ export async function forgotPassword(req, res) {
     );
     const link = `${websiteUrl()}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
     try {
-      await sendEmail({ to: email, subject: "AKFashionPlus - Password / Mot de passe / Palavra-passe",
+      await sendEmail({ to: email, subject: "AK Fashion Plus - Password / Mot de passe / Palavra-passe",
         text: `Reinitialisez votre mot de passe / Reset your password / Redefina a sua palavra-passe:\n\n${link}\n\nCe lien expire dans 30 minutes. / This link expires in 30 minutes. / Este link expira em 30 minutos.\nIgnorez ce message si vous n'avez pas fait cette demande.` });
     } catch {
       console.error("Password reset email could not be delivered");

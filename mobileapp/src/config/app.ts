@@ -10,7 +10,7 @@ const expoExtra = (Constants.expoConfig?.extra || {}) as {
 };
 
 export const appConfig = {
-  name: "AKFashionPlus",
+  name: "AK Fashion Plus",
   apiUrl:
     cleanEnvValue(expoExtra.apiUrl) ||
     cleanEnvValue(process.env.EXPO_PUBLIC_API_URL) ||

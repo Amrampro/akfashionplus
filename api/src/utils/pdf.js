@@ -2,11 +2,12 @@ import PDFDocument from "pdfkit";
 
 const navy = "#0B1845";
 const gold = "#D7A51B";
+const companyName = "Alfredo kavula Fashion Plus Unip Lda";
 const statuses = { paid: "PAYE", pending: "EN ATTENTE", unpaid: "NON PAYE", failed: "ECHEC", refunded: "REMBOURSE", partially_paid: "PARTIELLEMENT PAYE", cancelled: "ANNULE", approved: "APPROUVE", requested: "DEMANDE" };
 
 export function createTextPdf({ title, lines, status }) {
   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size: "A4", margin: 42, bufferPages: true, info: { Title: title, Author: "AKFashionPlus" } });
+    const doc = new PDFDocument({ size: "A4", margin: 42, bufferPages: true, info: { Title: title, Author: companyName } });
     const chunks = [];
     doc.on("data", (chunk) => chunks.push(chunk));
     doc.on("error", reject);
@@ -15,7 +16,7 @@ export function createTextPdf({ title, lines, status }) {
     function header() {
       doc.rect(0, 0, 595.28, 108).fill(navy);
       doc.rect(0, 108, 595.28, 5).fill(gold);
-      doc.fillColor(gold).font("Helvetica-Bold").fontSize(23).text("AKFashionPlus", 42, 28);
+      doc.fillColor(gold).font("Helvetica-Bold").fontSize(20).text(companyName, 42, 28, { width: 511 });
       doc.fillColor("white").font("Helvetica").fontSize(11).text(title, 42, 65, { width: 510 });
       y = 134;
       if (status) {
@@ -45,7 +46,7 @@ export function createTextPdf({ title, lines, status }) {
     for (let page = 0; page < range.count; page++) {
       doc.switchToPage(page);
       doc.moveTo(42, 781).lineTo(553, 781).strokeColor(gold).lineWidth(1).stroke();
-      doc.fillColor("#626A7A").font("Helvetica").fontSize(8).text("AKFashionPlus | support@akfashionplus.com", 42, 792, { lineBreak: false });
+      doc.fillColor("#626A7A").font("Helvetica").fontSize(8).text("AK Fashion Plus | support@akfashionplus.com", 42, 792, { lineBreak: false });
       doc.text((page + 1) + " / " + range.count, 508, 792, { lineBreak: false });
     }
     doc.end();
