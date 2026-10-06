@@ -89,7 +89,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     (key: string, params?: TranslationParams) => {
       const translated =
         readTranslation(dictionaries[language], key) ||
-        readTranslation(dictionaries.fr, key) ||
+        readTranslation(dictionaries.pt, key) ||
         key;
 
       return interpolate(translated, params);

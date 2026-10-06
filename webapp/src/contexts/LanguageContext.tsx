@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import fr from "../locales/fr";
 import en from "../locales/en";
 import pt from "../locales/pt";
@@ -23,7 +23,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>(() =>
     normalizeLanguage(localStorage.getItem("ak_language")),
   );
-  const t = useMemo(() => dictionaries[language], [language]);
+  const t = useMemo(() => ({ ...pt, ...dictionaries[language] }), [language]);
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   const update = (next: Language) => {
     const normalized = normalizeLanguage(next);

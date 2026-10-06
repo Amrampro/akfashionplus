@@ -17,13 +17,13 @@
 
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.akfashionplus.app",
+      "bundleIdentifier": "com.goulbam.akfashionplus",
       "buildNumber": "1"
     },
 
     "android": {
       "softwareKeyboardLayoutMode": "resize",
-      "package": "com.akfashionplus.app",
+      "package": "com.goulbam.akfashionplus",
       "versionCode": 1,
 
       "adaptiveIcon": {
