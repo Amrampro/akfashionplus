@@ -17,13 +17,13 @@
 
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.goulbam.akfashionplus",
+      "bundleIdentifier": "com.goulbam.kavulafashionp",
       "buildNumber": "1"
     },
 
     "android": {
       "softwareKeyboardLayoutMode": "resize",
-      "package": "com.goulbam.akfashionplus",
+      "package": "com.goulbam.kavulafashionp",
       "versionCode": 1,
 
       "adaptiveIcon": {
