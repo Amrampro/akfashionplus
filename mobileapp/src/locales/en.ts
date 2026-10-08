@@ -283,6 +283,9 @@ export default {
     loginToBuy: "Sign in to buy",
   },
   productDetails: {
+    enlargeImage: "Enlarge image",
+    previousImage: "Previous image",
+    nextImage: "Next image",
     loading: "Loading product...",
     unavailable: "Product unavailable",
     noProductData: "No product data.",

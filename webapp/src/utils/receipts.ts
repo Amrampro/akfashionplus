@@ -5,7 +5,9 @@ type ReceiptType = "order" | "rental" | "resale";
 export async function downloadReceipt(type: ReceiptType, id: number | string) {
   const token =
     localStorage.getItem("ak_auth_token") || localStorage.getItem("ak_token");
-  const response = await fetch(`${appConfig.apiUrl}/receipts/${type}/${id}.pdf`, {
+  const selectedLanguage = localStorage.getItem("ak_language");
+  const language = selectedLanguage && ["pt", "fr", "en"].includes(selectedLanguage) ? selectedLanguage : "pt";
+  const response = await fetch(`${appConfig.apiUrl}/receipts/${type}/${id}.pdf?lang=${language}`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },

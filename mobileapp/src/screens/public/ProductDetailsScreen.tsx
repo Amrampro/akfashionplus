@@ -1,4 +1,5 @@
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
+import { SafeAreaProvider, SafeAreaView as ModalSafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Image,
@@ -124,13 +125,15 @@ function galleryFor(product: ProductDetails) {
 function ProductVisual({
   product,
   image,
+  onPress,
 }: {
   product: ProductDetails;
   image?: ProductImageRow;
+  onPress?: () => void;
 }) {
   const uri = absoluteImageUrl(image?.image_url || product.image_url);
   if (uri) {
-    return <ZoomableImage uri={uri} style={styles.mainImage} />;
+    return <ZoomableImage uri={uri} style={styles.mainImage} onPress={onPress} />;
   }
   return (
     <View style={styles.mainImagePlaceholder}>
@@ -162,6 +165,8 @@ export default function ProductDetailsScreen({ slug, onBack }: Props) {
   const [product, setProduct] = useState<ProductDetails | null>(null);
   const [settings, setSettings] = useState<SettingsPayload>({});
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const [viewerSize, setViewerSize] = useState({ width: 0, height: 0 });
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
   const [rentalDays, setRentalDays] = useState(2);
   const [rentalModalOpen, setRentalModalOpen] = useState(false);
@@ -201,6 +206,7 @@ export default function ProductDetailsScreen({ slug, onBack }: Props) {
         setSettings(settingsResult);
         setProduct(productResult);
         setSelectedImageIndex(0);
+        setViewerIndex(null);
         setSelectedVariantId(productResult.variants?.[0]?.id || null);
       } catch (loadError) {
         if (mounted) {
@@ -363,7 +369,7 @@ export default function ProductDetailsScreen({ slug, onBack }: Props) {
               >
                 {gallery.map((image, index) => (
                   <View key={`${image.id}-${index}`} style={{ width: mediaWidth }}>
-                    <ProductVisual product={product} image={image} />
+                    <ProductVisual product={product} image={image} onPress={() => setViewerIndex(index)} />
                   </View>
                 ))}
               </ScrollView>
@@ -391,7 +397,9 @@ export default function ProductDetailsScreen({ slug, onBack }: Props) {
                     {isFavorite(product.id) ? "♥" : "♡"}
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.roundButton}>
+                <TouchableOpacity style={styles.roundButton} disabled={!gallery.length}
+                  accessibilityRole="button" accessibilityLabel={t("productDetails.enlargeImage")}
+                  onPress={() => setViewerIndex(selectedImageIndex)}>
                   <Text style={styles.roundButtonText}>↗</Text>
                 </TouchableOpacity>
               </View>
@@ -638,6 +646,39 @@ export default function ProductDetailsScreen({ slug, onBack }: Props) {
             </TouchableOpacity>
           ) : null}
         </View>
+        <Modal visible={viewerIndex !== null} animationType="fade" presentationStyle="fullScreen"
+          onRequestClose={() => setViewerIndex(null)}>
+          <SafeAreaProvider>
+          <ModalSafeAreaView style={styles.imageViewer}>
+            <View style={styles.viewerToolbar}>
+              <Text style={styles.viewerCount}>{(viewerIndex ?? 0) + 1} / {gallery.length}</Text>
+              <TouchableOpacity style={styles.roundButton} onPress={() => setViewerIndex(null)}
+                accessibilityRole="button" accessibilityLabel={t("common.close")}>
+                <Text style={styles.roundButtonText}>×</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ flex: 1 }} onLayout={({ nativeEvent }) => setViewerSize({ width: nativeEvent.layout.width, height: nativeEvent.layout.height })}>
+              {viewerIndex !== null && viewerSize.width > 0 && viewerSize.height > 0 ? (
+                <ZoomableImage key={`${viewerIndex}-${viewerSize.width}-${viewerSize.height}`}
+                  uri={absoluteImageUrl(gallery[viewerIndex]?.image_url)}
+                  viewport={viewerSize} style={viewerSize} />
+              ) : null}
+            </View>
+            {gallery.length > 1 ? <View style={styles.viewerNavigation}>
+              <TouchableOpacity style={[styles.roundButton, viewerIndex === 0 && { opacity: 0.3 }]}
+                disabled={viewerIndex === 0} accessibilityRole="button" accessibilityLabel={t("productDetails.previousImage")}
+                onPress={() => setViewerIndex((index) => Math.max(0, (index ?? 0) - 1))}>
+                <Text style={styles.roundButtonText}>‹</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.roundButton, viewerIndex === gallery.length - 1 && { opacity: 0.3 }]}
+                disabled={viewerIndex === gallery.length - 1} accessibilityRole="button" accessibilityLabel={t("productDetails.nextImage")}
+                onPress={() => setViewerIndex((index) => Math.min(gallery.length - 1, (index ?? 0) + 1))}>
+                <Text style={styles.roundButtonText}>›</Text>
+              </TouchableOpacity>
+            </View> : null}
+          </ModalSafeAreaView>
+          </SafeAreaProvider>
+        </Modal>
         <Modal transparent visible={rentalModalOpen} animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={styles.rentalModal}>
@@ -698,6 +739,10 @@ export default function ProductDetailsScreen({ slug, onBack }: Props) {
 }
 
 const styles = StyleSheet.create({
+  imageViewer: { flex: 1, backgroundColor: "#111111" },
+  viewerToolbar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16 },
+  viewerCount: { color: "#FFFFFF", fontSize: 16 },
+  viewerNavigation: { flexDirection: "row", justifyContent: "space-evenly", padding: 16 },
   safe: {
     flex: 1,
     backgroundColor: theme.colors.paper,

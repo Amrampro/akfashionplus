@@ -1,22 +1,7 @@
 import { fail } from "../utils/apiResponse.js";
 import { query } from "../config/database.js";
 import { sendPdf } from "../utils/pdf.js";
-
-function eur(value) {
-  return `${Number(value || 0).toFixed(2)} EUR`;
-}
-
-function aoa(value, currency = "AOA") {
-  return `${Math.round(Number(value || 0)).toLocaleString("fr-FR")} ${currency}`;
-}
-
-function date(value) {
-  if (!value) return "-";
-  return new Intl.DateTimeFormat("fr-FR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
+import { receiptLanguage, receiptLocale } from "../utils/receiptLocale.js";
 
 function staffOnly(req, res) {
   if (!["admin", "cashier"].includes(req.user.role)) {
@@ -33,7 +18,8 @@ async function currencyLabel() {
   return rows[0]?.setting_value || "AOA";
 }
 
-async function orderReceipt(orderId) {
+async function orderReceipt(orderId, language) {
+  const { t, value, eur, aoa, date } = receiptLocale(language);
   const rows = await query(
     `SELECT o.*,
       CONCAT(u.first_name, ' ', u.last_name) AS customer_name,
@@ -67,47 +53,49 @@ async function orderReceipt(orderId) {
   );
   const currency = await currencyLabel();
   const mode =
-    order.fulfillment_type === "delivery" ? "Livraison article" : "Retrait article";
+    order.fulfillment_type === "delivery" ? t("deliveryItem") : t("pickupItem");
 
   return {
     filename: `recu-commande-${order.order_number}.pdf`,
-    title: "Recu AK Fashion Plus - Commande",
+    title: `${t("receipt")} - ${t("order")}`,
+    language,
     status: order.payment_status,
     lines: [
-      `Reference: ${order.order_number}`,
-      `Type: ${mode}`,
-      `Client: ${order.customer_name} - ${order.customer_email}`,
-      `Beneficiaire: ${order.beneficiary_name || "-"} - ${order.beneficiary_phone || "-"}`,
-      `Adresse: ${[order.shipping_address_line_1, order.shipping_address_line_2, order.shipping_city, order.shipping_postal_code, order.shipping_country_code].filter(Boolean).join(", ") || "-"}`,
-      `Guichet: ${order.branch_name || "-"} ${order.branch_city || ""}`,
-      `Date: ${date(order.created_at)}`,
-      `Paiement: ${order.payment_status || "-"} / Statut: ${order.status || "-"}`,
-      `Sous-total: ${eur(order.subtotal_eur)}`,
-      `Livraison: ${eur(order.shipping_total_eur)}`,
-      `Remise: ${eur(order.discount_total_eur)}`,
-      `Total: ${eur(order.total_eur)} - ${aoa(order.total_aoa, currency)}`,
+      `${t("reference")}: ${order.order_number}`,
+      `${t("type")}: ${mode}`,
+      `${t("customer")}: ${order.customer_name} - ${order.customer_email}`,
+      `${t("beneficiary")}: ${order.beneficiary_name || "-"} - ${order.beneficiary_phone || "-"}`,
+      `${t("address")}: ${[order.shipping_address_line_1, order.shipping_address_line_2, order.shipping_city, order.shipping_postal_code, order.shipping_country_code].filter(Boolean).join(", ") || "-"}`,
+      `${t("branch")}: ${order.branch_name || "-"} ${order.branch_city || ""}`,
+      `${t("date")}: ${date(order.created_at)}`,
+      `${t("payment")}: ${value(order.payment_status)} / ${t("status")}: ${value(order.status)}`,
+      `${t("subtotal")}: ${eur(order.subtotal_eur)}`,
+      `${t("delivery")}: ${eur(order.shipping_total_eur)}`,
+      `${t("discount")}: ${eur(order.discount_total_eur)}`,
+      `${t("total")}: ${eur(order.total_eur)} - ${aoa(order.total_aoa, currency)}`,
       "",
-      "Articles",
+      t("items"),
       ...items.map((item) => {
         const rental =
           item.item_type === "rental"
-            ? ` - location ${item.rental_days || 0} jour(s), du ${item.rental_start_date || "-"} au ${item.rental_end_date || "-"}`
+            ? ` - ${t("rental")} ${item.rental_days || 0} ${t("dayUnit")}, ${t("from")} ${date(item.rental_start_date, true)} ${t("to")} ${date(item.rental_end_date, true)}`
             : "";
         return `${item.quantity} x ${item.product_name} (${item.sku || "-"}) - ${eur(item.line_total_eur)}${rental}`;
       }),
       "",
-      "Paiements",
+      t("payments"),
       ...(payments.length
         ? payments.map(
             (payment) =>
-              `${payment.method} / ${payment.purpose} - ${eur(payment.amount_eur)} - ${payment.status} - ${date(payment.created_at)}`,
+              `${value(payment.method)} / ${value(payment.purpose)} - ${eur(payment.amount_eur)} - ${value(payment.status)} - ${date(payment.created_at)}`,
           )
-        : ["Aucun paiement detaille."]),
+        : [t("noPayments")]),
     ],
   };
 }
 
-async function rentalReceipt(orderItemId) {
+async function rentalReceipt(orderItemId, language) {
+  const { t, value, eur, aoa, date } = receiptLocale(language);
   const rows = await query(
     `SELECT oi.*, o.order_number, o.created_at, o.payment_status,
       o.beneficiary_name, o.beneficiary_phone,
@@ -128,30 +116,32 @@ async function rentalReceipt(orderItemId) {
 
   return {
     filename: `recu-location-${rental.order_number}-${rental.id}.pdf`,
-    title: "Recu AK Fashion Plus - Location",
+    title: `${t("receipt")} - ${t("rental")}`,
+    language,
     status: rental.payment_status,
     lines: [
-      `Reference: ${rental.order_number}`,
-      "Type: Location article",
-      `Client: ${rental.customer_name} - ${rental.customer_email}`,
-      `Beneficiaire: ${rental.beneficiary_name || "-"} - ${rental.beneficiary_phone || "-"}`,
-      `Article: ${rental.product_name} (${rental.sku || "-"})`,
-      `Variante: ${rental.size || "-"} / ${rental.color || "-"}`,
-      `Depart: ${rental.rental_start_date || "-"}`,
-      `Retour prevu: ${rental.rental_end_date || "-"}`,
-      `Nombre de jours: ${rental.rental_days || 0}`,
-      `Prix/jour: ${eur(rental.rental_price_per_day_eur)}`,
-      `Caution: ${eur(rental.rental_deposit_eur)}`,
-      `Total location: ${eur(rental.line_total_eur)}`,
-      `Guichet: ${rental.branch_name || "-"} ${rental.branch_city || ""}`,
-      `Paiement: ${rental.payment_status || "-"}`,
-      `Statut location: ${rental.rental_status || "-"}`,
-      `Date commande: ${date(rental.created_at)}`,
+      `${t("reference")}: ${rental.order_number}`,
+      `${t("type")}: ${t("rentalItem")}`,
+      `${t("customer")}: ${rental.customer_name} - ${rental.customer_email}`,
+      `${t("beneficiary")}: ${rental.beneficiary_name || "-"} - ${rental.beneficiary_phone || "-"}`,
+      `${t("item")}: ${rental.product_name} (${rental.sku || "-"})`,
+      `${t("variant")}: ${rental.size || "-"} / ${rental.color || "-"}`,
+      `${t("start")}: ${date(rental.rental_start_date, true)}`,
+      `${t("return")}: ${date(rental.rental_end_date, true)}`,
+      `${t("days")}: ${rental.rental_days || 0}`,
+      `${t("dailyPrice")}: ${eur(rental.rental_price_per_day_eur)}`,
+      `${t("deposit")}: ${eur(rental.rental_deposit_eur)}`,
+      `${t("rentalTotal")}: ${eur(rental.line_total_eur)}`,
+      `${t("branch")}: ${rental.branch_name || "-"} ${rental.branch_city || ""}`,
+      `${t("payment")}: ${value(rental.payment_status)}`,
+      `${t("rentalStatus")}: ${value(rental.rental_status)}`,
+      `${t("orderDate")}: ${date(rental.created_at)}`,
     ],
   };
 }
 
-async function resaleReceipt(resaleId) {
+async function resaleReceipt(resaleId, language) {
+  const { t, value, eur, aoa, date } = receiptLocale(language);
   const rows = await query(
     `SELECT cr.*, o.order_number, o.created_at,
       oi.product_name, oi.sku, oi.size, oi.color,
@@ -176,24 +166,25 @@ async function resaleReceipt(resaleId) {
 
   return {
     filename: `recu-revente-${resale.order_number}-${resale.id}.pdf`,
-    title: "Recu AK Fashion Plus - Revente",
+    title: `${t("receipt")} - ${t("resale")}`,
+    language,
     status: resale.status,
     lines: [
-      `Reference: ${resale.order_number}`,
-      "Type: Retrait argent revente AK",
-      `Client: ${resale.customer_name} - ${resale.customer_email}`,
-      `Beneficiaire: ${resale.beneficiary_name || "-"} - ${resale.beneficiary_phone || "-"}`,
-      `Article: ${resale.product_name} (${resale.sku || "-"})`,
-      `Variante: ${resale.size || "-"} / ${resale.color || "-"}`,
-      `Valeur EUR: ${eur(resale.amount_eur)}`,
-      `Taux: 1 EUR = ${Number(resale.exchange_rate_eur_to_aoa || 0)} ${currency}`,
-      `Montant retire equivalent: ${aoa(resale.payout_amount_aoa, currency)}`,
-      `Guichet: ${resale.branch_name || "-"} ${resale.branch_city || ""}`,
-      `Caissier: ${resale.cashier_name || "-"}`,
-      `Document: ${resale.identity_document_type || "-"} ${resale.identity_document_number || ""}`,
-      `Statut: ${resale.status || "-"}`,
-      `Demande: ${date(resale.requested_at)}`,
-      `Paiement: ${date(resale.paid_at)}`,
+      `${t("reference")}: ${resale.order_number}`,
+      `${t("type")}: ${t("resalePayout")}`,
+      `${t("customer")}: ${resale.customer_name} - ${resale.customer_email}`,
+      `${t("beneficiary")}: ${resale.beneficiary_name || "-"} - ${resale.beneficiary_phone || "-"}`,
+      `${t("item")}: ${resale.product_name} (${resale.sku || "-"})`,
+      `${t("variant")}: ${resale.size || "-"} / ${resale.color || "-"}`,
+      `${t("eurValue")}: ${eur(resale.amount_eur)}`,
+      `${t("rate")}: 1 EUR = ${Number(resale.exchange_rate_eur_to_aoa || 0)} ${currency}`,
+      `${t("payout")}: ${aoa(resale.payout_amount_aoa, currency)}`,
+      `${t("branch")}: ${resale.branch_name || "-"} ${resale.branch_city || ""}`,
+      `${t("cashier")}: ${resale.cashier_name || "-"}`,
+      `${t("document")}: ${resale.identity_document_type || "-"} ${resale.identity_document_number || ""}`,
+      `${t("status")}: ${value(resale.status)}`,
+      `${t("requestedAt")}: ${date(resale.requested_at)}`,
+      `${t("payment")}: ${date(resale.paid_at)}`,
     ],
   };
 }
@@ -216,7 +207,7 @@ export async function downloadReceipt(req, res) {
   const builder = builders[req.params.type];
   if (!builder) return fail(res, 404, "Receipt type not found");
 
-  const payload = await builder(id);
+  const payload = await builder(id, receiptLanguage(req));
   if (!payload) return fail(res, 404, "Receipt not found");
 
   return sendPdf(res, payload.filename, payload);

@@ -1,11 +1,12 @@
 import PDFDocument from "pdfkit";
+import { receiptLocale } from "./receiptLocale.js";
 
 const navy = "#0B1845";
 const gold = "#D7A51B";
 const companyName = "Alfredo kavula Fashion Plus Unip Lda";
-const statuses = { paid: "PAYE", pending: "EN ATTENTE", unpaid: "NON PAYE", failed: "ECHEC", refunded: "REMBOURSE", partially_paid: "PARTIELLEMENT PAYE", cancelled: "ANNULE", approved: "APPROUVE", requested: "DEMANDE" };
 
-export function createTextPdf({ title, lines, status }) {
+export function createTextPdf({ title, lines, status, language = "pt" }) {
+  const { t, value } = receiptLocale(language);
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ size: "A4", margin: 42, bufferPages: true, info: { Title: title, Author: companyName } });
     const chunks = [];
@@ -20,9 +21,9 @@ export function createTextPdf({ title, lines, status }) {
       doc.fillColor("white").font("Helvetica").fontSize(11).text(title, 42, 65, { width: 510 });
       y = 134;
       if (status) {
-        const label = statuses[status] || String(status).toUpperCase();
+        const label = String(value(status)).toUpperCase();
         doc.roundedRect(42, y, 511, 30, 4).fill(status === "paid" ? "#E7F4EC" : "#FFF3D5");
-        doc.fillColor(navy).font("Helvetica-Bold").fontSize(10).text("STATUT : " + label, 54, y + 10, { width: 485 });
+        doc.fillColor(navy).font("Helvetica-Bold").fontSize(10).text(t("status").toUpperCase() + " : " + label, 54, y + 10, { width: 485 });
         y += 46;
       }
     }
@@ -31,8 +32,8 @@ export function createTextPdf({ title, lines, status }) {
     for (const raw of lines) {
       const line = String(raw || "").replace(/\u202f|\u00a0/g, " ");
       if (!line) { y += 12; continue; }
-      const section = ["Articles", "Paiements"].includes(line);
-      const total = /^(Total|Valeur EUR|Montant retire)/.test(line);
+      const section = [t("items"), t("payments")].includes(line);
+      const total = [t("total"), t("rentalTotal"), t("eurValue"), t("payout")].some((label) => line.startsWith(label + ":"));
       doc.font(section || total ? "Helvetica-Bold" : "Helvetica").fontSize(section ? 12 : 10);
       const height = doc.heightOfString(line, { width: 485, lineGap: 3 }) + 20;
       if (y + height > 760) { doc.addPage(); header(); }

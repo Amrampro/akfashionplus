@@ -315,7 +315,7 @@ export default function OrderDetailsScreen({ orderId, onBack }: Props) {
   const receiptLabel = { fr: "Telecharger le recu PDF", en: "Download PDF receipt", pt: "Descarregar recibo PDF" }[language];
   async function downloadReceipt() {
     setDownloading(true);
-    try { await downloadOrderReceipt(Number(orderId)); }
+    try { await downloadOrderReceipt(Number(orderId), language); }
     catch { setError({ fr: "Impossible de telecharger le recu.", en: "Unable to download receipt.", pt: "Nao foi possivel descarregar o recibo." }[language]); }
     finally { setDownloading(false); }
   }
