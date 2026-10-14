@@ -35,7 +35,7 @@ type Props = {
 };
 
 type SettingsPayload = {
-  settings?: Array<{ setting_key: string; setting_value: string | null }> | Record<string, string | number | null>;
+  exchange_rate_eur_to_aoa?: number | string | null;
 };
 
 type OrderResponse = {
@@ -83,24 +83,16 @@ function numeric(value: number | string | null | undefined) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function settingValue(settings: SettingsPayload["settings"], key: string) {
-  if (!settings) return undefined;
-  if (Array.isArray(settings)) {
-    return settings.find((item) => item.setting_key === key)?.setting_value || undefined;
-  }
-  const value = settings[key];
-  return value === null || value === undefined ? undefined : String(value);
-}
-
 function formatEur(value: number, locale = "fr-FR") {
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "EUR",
+    useGrouping: true,
   }).format(value);
 }
 
 function formatSecondary(value: number, label: string, locale = "fr-FR") {
-  return `${Math.round(value).toLocaleString(locale)} ${label}`;
+  return `${value.toLocaleString(locale, { useGrouping: true, minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${label}`;
 }
 
 function checkoutLine(item: CartItem) {
@@ -172,9 +164,9 @@ export default function CheckoutScreen({ onBack, onSuccess, onFailure }: Props) 
   const { items, subtotal, clearCart } = useCart();
   const { language, locale, t } = useLanguage();
   const [settings, setSettings] = useState<SettingsPayload>({});
-  const [beneficiaryName, setBeneficiaryName] = useState("Alfredo Kavula");
-  const [beneficiaryPhone, setBeneficiaryPhone] = useState("+244 912 345 678");
-  const [address, setAddress] = useState("Rua Rainha Ginga, No 23");
+  const [beneficiaryName, setBeneficiaryName] = useState("");
+  const [beneficiaryPhone, setBeneficiaryPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [fulfillment, setFulfillment] = useState<"delivery" | "pickup">("delivery");
   const [deliveryCountries, setDeliveryCountries] = useState<DeliveryCountry[]>([]);
   const [shippingCountryCode, setShippingCountryCode] = useState("AO");
@@ -240,12 +232,8 @@ export default function CheckoutScreen({ onBack, onSuccess, onFailure }: Props) 
     };
   }, [user]);
 
-  const currencyLabel =
-    settingValue(settings.settings, "secondary_currency_label") ||
-    settingValue(settings.settings, "currency_secondary") ||
-    settingValue(settings.settings, "aoa_currency_label") ||
-    "AOA";
-  const exchangeRate = numeric(settingValue(settings.settings, "exchange_rate_eur_to_aoa")) || 1000;
+  const exchangeRate = numeric(settings.exchange_rate_eur_to_aoa);
+  const hasExchangeRate = exchangeRate > 0;
   const selectedDeliveryCountry = deliveryCountries.find(
     (country) => country.country_code === shippingCountryCode,
   );
@@ -444,25 +432,34 @@ export default function CheckoutScreen({ onBack, onSuccess, onFailure }: Props) 
             <Text style={styles.eyebrow}>{t("checkoutPage.paymentTitle")}</Text>
             <Text style={styles.title}>{t("checkoutPage.beneficiaryTitle")}</Text>
 
+            <View style={styles.countryBlock}>
+            <Text style={styles.countryLabel}>{t("checkoutPage.fullNamePlaceholder")}</Text>
             <TextInput
               value={beneficiaryName}
               onChangeText={setBeneficiaryName}
-              placeholder={t("checkoutPage.fullNamePlaceholder")}
+              accessibilityLabel={t("checkoutPage.fullNamePlaceholder")}
               style={styles.input}
             />
+            </View>
+            <View style={styles.countryBlock}>
+            <Text style={styles.countryLabel}>{t("checkoutPage.phonePlaceholder")}</Text>
             <TextInput
               value={beneficiaryPhone}
               onChangeText={setBeneficiaryPhone}
-              placeholder={t("checkoutPage.phonePlaceholder")}
+              accessibilityLabel={t("checkoutPage.phonePlaceholder")}
               keyboardType="phone-pad"
               style={styles.input}
             />
+            </View>
+            <View style={styles.countryBlock}>
+            <Text style={styles.countryLabel}>{t("checkoutPage.addressPlaceholder")}</Text>
             <TextInput
               value={address}
               onChangeText={setAddress}
-              placeholder={t("checkoutPage.addressPlaceholder")}
+              accessibilityLabel={t("checkoutPage.addressPlaceholder")}
               style={styles.input}
             />
+            </View>
 
             <View style={styles.countryBlock}>
               <Text style={styles.countryLabel}>{t("profile.country")}</Text>
@@ -547,7 +544,8 @@ export default function CheckoutScreen({ onBack, onSuccess, onFailure }: Props) 
               <Text style={styles.resaleText}>
                 {t("checkoutPage.resalePrefix")}{" "}
                 <Text style={styles.resaleAmount}>
-                  {formatSecondary(resaleValue, "Kwanza", locale)}
+                  {formatEur(subtotal, locale)}
+                  {hasExchangeRate ? ` / ${formatSecondary(resaleValue, "Kwanza", locale)}` : ""}
                 </Text>
                 .
               </Text>
@@ -646,9 +644,9 @@ export default function CheckoutScreen({ onBack, onSuccess, onFailure }: Props) 
               <Text style={styles.totalLabel}>{t("common.total")}</Text>
               <View style={styles.totalBlock}>
                 <Text style={styles.totalValue}>{formatEur(total, locale)}</Text>
-                <Text style={styles.secondaryTotal}>
-                  {formatSecondary(total * exchangeRate, currencyLabel, locale)}
-                </Text>
+                {hasExchangeRate ? <Text style={styles.secondaryTotal}>
+                  {formatSecondary(total * exchangeRate, "Kwanza", locale)}
+                </Text> : null}
               </View>
             </View>
             {giftCardPaid > 0 ? (
