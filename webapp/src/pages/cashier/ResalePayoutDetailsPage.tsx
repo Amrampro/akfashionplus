@@ -43,7 +43,7 @@ export default function ResalePayoutDetailsPage(props: CashierPageProps) {
       <section className="cashier-page">
         <section className="cashier-hero">
           <div>
-            <p>Details revente</p>
+            <p>Details du cadeau</p>
             <h2>Paiement au guichet</h2>
             <span>
               Controle du beneficiaire, du montant EUR converti en devise locale et de
@@ -51,7 +51,7 @@ export default function ResalePayoutDetailsPage(props: CashierPageProps) {
             </span>
           </div>
           <button onClick={() => props.go("cashier-resales")} type="button">
-            Retour reventes
+            Retour aux cadeaux
           </button>
         </section>
         {error ? <div className="cashier-error">{error}</div> : null}
@@ -86,7 +86,7 @@ export default function ResalePayoutDetailsPage(props: CashierPageProps) {
               </article>
             </div>
           ) : (
-            <p className="cashier-empty">Aucune revente disponible.</p>
+            <p className="cashier-empty">Aucun cadeau disponible.</p>
           )}
         </section>
       </section>

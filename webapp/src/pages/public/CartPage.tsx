@@ -5,8 +5,8 @@ export default function CartPage() {
     <PageShell
       area="Public"
       title="Panier"
-      description="Resume des articles, quantites, location, revente a AK Fashion Plus et total avant paiement."
-      metrics={["Articles", "Total", "Location", "Revente"]}
+      description="Resume des articles, quantites, location, cadeau a AK Fashion Plus et total avant paiement."
+      metrics={["Articles", "Total", "Location", "Cadeau offert"]}
     />
   );
 }

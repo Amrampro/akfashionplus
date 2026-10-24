@@ -187,7 +187,7 @@ export default function ResalesPage({
       .then(() => get<ResaleRow[]>(listPath))
       .then((rows) => {
         setResales(rows || []);
-        setSuccess("Revente mise a jour.");
+        setSuccess("Cadeau mis a jour.");
       })
       .catch((requestError: Error) => setError(requestError.message))
       .finally(() => setSavingId(null));
@@ -204,12 +204,10 @@ export default function ResalesPage({
       <section className="admin-resales-page">
         <section className="admin-hero">
           <div>
-            <p>Reventes</p>
-            <h2>Reventes AK Fashion Plus</h2>
+            <p>Cadeaux offerts</p>
+            <h2>Cadeaux offerts AK Fashion Plus</h2>
             <span>
-              Suivez uniquement les articles marques "revendre a AK Fashion
-              Plus", avec statut de recuperation, guichet, caissier et valeur
-              {localStorage.getItem("ak_display_currency") || "AOA"}.
+              Suivez les cadeaux offerts, leur statut et leur retrait au guichet.
             </span>
           </div>
           <button onClick={() => go("admin-orders")} type="button">
@@ -291,7 +289,7 @@ export default function ResalesPage({
           <div className="admin-section-heading">
             <div>
               <p>Guichet {localStorage.getItem("ak_display_currency") || "AOA"}</p>
-              <h3>Articles a revendre</h3>
+              <h3>Articles a offrir</h3>
             </div>
             <strong>{visibleResales.length}</strong>
           </div>
@@ -408,10 +406,9 @@ export default function ResalesPage({
             </table>
             {!loading && !visibleResales.length && (
               <div className="admin-empty-state">
-                <strong>Aucune revente trouvee</strong>
+                <strong>Aucun cadeau trouve</strong>
                 <p>
-                  Les articles apparaitront ici uniquement si le client a choisi
-                  l'option revendre a AK Fashion Plus pendant sa commande.
+                  Les cadeaux apparaissent ici lorsque le client choisit cette option pendant sa commande.
                 </p>
               </div>
             )}

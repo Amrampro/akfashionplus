@@ -87,7 +87,7 @@ async function resolveResaleBranchId(requestedBranchId, connection = db) {
   const branchId = Number(rows[0]?.id || 0);
   if (!branchId) {
     throw Object.assign(
-      new Error("Aucun guichet actif disponible pour la revente"),
+      new Error("Aucun guichet actif disponible pour le cadeau"),
       { status: 422 },
     );
   }
@@ -380,7 +380,7 @@ export async function checkout(req, res) {
       if (req.body.resell_to_company && item.item_type === "purchase") {
         if (!req.body.beneficiary_name) {
           throw Object.assign(
-            new Error("Beneficiary is required for company resale"),
+            new Error("Beneficiary is required for a gift"),
             { status: 422 },
           );
         }
@@ -583,7 +583,7 @@ export async function directCheckout(req, res) {
         total_aoa: toAoa(total, rate),
         resell_to_company: Boolean(req.body.resell_to_company),
         customer_notes: req.body.resell_to_company
-          ? "Client requested company resale payout at counter."
+          ? "Client requested a gift to be prepared at the counter."
           : req.body.customer_notes || null,
       },
       connection,
@@ -630,7 +630,7 @@ export async function directCheckout(req, res) {
       if (req.body.resell_to_company && item.itemType === "purchase") {
         if (!req.body.beneficiary_name) {
           throw Object.assign(
-            new Error("Beneficiary is required for company resale"),
+            new Error("Beneficiary is required for a gift"),
             { status: 422 },
           );
         }

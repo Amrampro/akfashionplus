@@ -74,7 +74,7 @@ function typeLabel(value: string) {
     payment: "Paiement",
     pickup: "Retrait",
     rental: "Location",
-    resale: "Revente",
+    resale: "Cadeau offert",
     stock: "Stock",
   };
   return labels[value] || value;
@@ -495,7 +495,7 @@ export default function NotificationsPage({
                     <option value="rental">Location</option>
                     <option value="gift_card">Carte cadeau</option>
                     <option value="pickup">Retrait</option>
-                    <option value="resale">Revente</option>
+                    <option value="resale">Cadeau offert</option>
                     <option value="stock">Stock</option>
                   </select>
                 </label>

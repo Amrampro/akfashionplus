@@ -80,13 +80,13 @@ export default {
     rentalTitle: "Rent your look",
     rentalSubtitle: "Pieces available by the day",
     secondHandTitle: "Second hand",
-    resaleTitle: "Resell to AK Fashion Plus",
+    resaleTitle: "Offer a gift",
     resaleText: "Current rate: 1 EUR = {{rate}} {{currency}}.",
     resaleLearnMore: "Learn more",
-    resaleModalEyebrow: "AK resale",
-    resaleModalTitle: "How does resale work?",
+    resaleModalEyebrow: "Gift offered",
+    resaleModalTitle: "How can I offer a gift?",
     resaleModalText:
-      "During checkout, you can choose to resell to AK Fashion Plus. The beneficiary then receives the equivalent in the secondary currency at the counter in Angola.",
+      "Choose to offer a gift during checkout. It will be prepared at the counter for the recipient.",
     resaleModalExampleLabel: "Example",
     resaleModalExampleText:
       "For 300 EUR of items, the beneficiary can receive {{amount}} in Angola using the active rate.",
@@ -283,6 +283,9 @@ export default {
     loginToBuy: "Sign in to buy",
   },
   productDetails: {
+    rentalStartDate: "Start date",
+    previousMonth: "Previous month",
+    nextMonth: "Next month",
     enlargeImage: "Enlarge image",
     previousImage: "Previous image",
     nextImage: "Next image",
@@ -441,8 +444,8 @@ export default {
     noRentalsTitle: "No active rentals",
     noRentalsText: "Your reserved or active rentals will appear here.",
     history: "My account",
-    resales: "AK resales",
-    resalesDetail: "Items to resell",
+    resales: "Gifts offered",
+    resalesDetail: "Gift items",
     profileDetail: "Personal information",
     notificationsDetail: "Messages",
     orderFallback: "AK order",
@@ -500,8 +503,8 @@ export default {
     body: "Your AK Fashion Plus rentals will appear with dates, returns and deposits.",
   },
   resalesPage: {
-    title: "Resales",
-    body: "Your AK Fashion Plus resale requests will appear with their processing status.",
+    title: "Gifts offered",
+    body: "Your gifts will appear with their processing status.",
   },
   favoritesPage: {
     eyebrow: "Selection",
@@ -531,7 +534,7 @@ export default {
   },
   ordersPage: {
     title: "My orders",
-    guestText: "Sign in to view your purchases, rentals and resales.",
+    guestText: "Sign in to view your purchases, rentals and gifts.",
     loadError: "Unable to load orders.",
     displayed: "Displayed",
     resale: "Gift offered",

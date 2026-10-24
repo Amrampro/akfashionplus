@@ -752,7 +752,6 @@ function HowItWorks() {
 }
 
 function ResaleBanner({
-  displayCurrency,
   go,
 }: {
   displayCurrency: string;
@@ -761,19 +760,16 @@ function ResaleBanner({
   return (
     <section className="home-resale-banner">
       <div>
-        <p className="eyebrow">Revendre a AK Fashion Plus</p>
+        <p className="eyebrow">Offrir un cadeau</p>
         <h2>
-          Achetez en Europe, votre beneficiaire recupere l'equivalent en Angola, Europe ou ailleurs
+          Choisissez un cadeau pour votre beneficiaire
         </h2>
         <p>
-          La plateforme gere les commandes, la valorisation, le taux EUR/
-          {displayCurrency || "KWANZA"} et
-          le paiement au guichet pour differencier AK Fashion Plus d'une
-          boutique classique.
+          Choisissez un cadeau lors du paiement. Sa valeur est affichee en euros et en Kwanza selon le taux en vigueur.
         </p>
       </div>
       <button onClick={() => go("user-dashboard")} type="button">
-        Decouvrir la revente
+        Decouvrir les cadeaux
       </button>
     </section>
   );

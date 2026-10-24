@@ -99,8 +99,8 @@ export default function CashierDashboardPage(props: CashierPageProps) {
     () => [
       ["Retraits a remettre", dashboard?.pending_pickups || 0],
       ["Locations a traiter", dashboard?.rentals_to_handle || 0],
-      ["Reventes a payer", dashboard?.pending_payouts || 0],
-      ["Montant revente", aoa(dashboard?.payout_aoa || 0)],
+      ["Cadeaux a traiter", dashboard?.pending_payouts || 0],
+      ["Valeur des cadeaux", aoa(dashboard?.payout_aoa || 0)],
     ],
     [dashboard],
   );
@@ -114,7 +114,7 @@ export default function CashierDashboardPage(props: CashierPageProps) {
             <h2>Tableau de bord guichet</h2>
             <span>
               Suivez les retraits clients, les locations a remettre ou retourner
-              et les paiements de revente a effectuer au comptoir.
+              et les paiements de cadeau a effectuer au comptoir.
             </span>
           </div>
           <button onClick={() => props.go("cashier-pickups")} type="button">
@@ -199,7 +199,7 @@ export default function CashierDashboardPage(props: CashierPageProps) {
           <article className="cashier-panel wide">
             <div className="cashier-panel-head">
               <div>
-                <p>Reventes AK</p>
+                <p>Cadeaux offerts</p>
                 <h3>Paiements a preparer</h3>
               </div>
               <button onClick={() => props.go("cashier-resales")} type="button">
@@ -229,7 +229,7 @@ export default function CashierDashboardPage(props: CashierPageProps) {
                   ))}
                   {!resales.length ? (
                     <tr>
-                      <td colSpan={5}>Aucune revente a payer.</td>
+                      <td colSpan={5}>Aucun cadeau a traiter.</td>
                     </tr>
                   ) : null}
                 </tbody>

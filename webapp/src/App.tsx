@@ -1929,9 +1929,11 @@ function CheckoutPage({
             type="checkbox"
           />
           <span>
-            Revendre a AK Fashion Plus au guichet et recevoir{" "}
+            {{ fr: "Offrir un cadeau d'une valeur de", en: "Offer a gift worth", pt: "Oferecer um presente no valor de" }[language]}{" "}
             <strong>
-              {secondaryMoney(resaleTotal, exchangeRate, displayCurrency)}
+              {new Intl.NumberFormat({ fr: "fr-FR", en: "en-GB", pt: "pt-PT" }[language], { style: "currency", currency: "EUR" }).format(resaleTotal)}
+              {" / "}
+              {new Intl.NumberFormat({ fr: "fr-FR", en: "en-GB", pt: "pt-PT" }[language], { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(resaleTotal * exchangeRate)} Kwanza
             </strong>
             .
           </span>

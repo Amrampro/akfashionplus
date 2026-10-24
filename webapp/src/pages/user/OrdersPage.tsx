@@ -42,8 +42,8 @@ const fulfillmentTypes = [
 
 const resaleFilters = [
   ["all", "Toutes"],
-  ["resale", "Avec revente"],
-  ["standard", "Sans revente"],
+  ["resale", "Avec cadeau"],
+  ["standard", "Sans cadeau"],
 ];
 
 function eur(value: number) {
@@ -158,7 +158,7 @@ export default function OrdersPage({ go }: { go: (page: string) => void }) {
           <strong>{loading ? "..." : eur(total)}</strong>
         </article>
         <article>
-          <span>Revente a recuperer</span>
+          <span>Cadeaux a recuperer</span>
           <strong>{loading ? "..." : aoa(resaleTotal)}</strong>
         </article>
       </section>
@@ -247,7 +247,7 @@ export default function OrdersPage({ go }: { go: (page: string) => void }) {
                   <small>{order.fulfillment_type}</small>
                   {Number(order.resale_items_count || 0) > 0 && (
                     <small className="user-resale-badge">
-                      Revente AK - {aoa(order.resale_payout_amount_aoa)}
+                      Cadeau offert - {aoa(order.resale_payout_amount_aoa)}
                     </small>
                   )}
                 </div>
@@ -256,7 +256,7 @@ export default function OrdersPage({ go }: { go: (page: string) => void }) {
                 <span className={`user-status status-${order.status}`}>
                   {order.status}
                   {order.resale_statuses && (
-                    <small>Revente: {order.resale_statuses}</small>
+                    <small>Cadeau offert: {order.resale_statuses}</small>
                   )}
                 </span>
                 <div>

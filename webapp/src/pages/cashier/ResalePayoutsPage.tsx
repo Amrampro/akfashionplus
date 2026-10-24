@@ -129,12 +129,10 @@ export default function ResalePayoutsPage(props: CashierPageProps) {
       <section className="cashier-page">
         <section className="cashier-hero">
           <div>
-            <p>Reventes AK</p>
-            <h2>Paiements revente</h2>
+            <p>Cadeaux offerts</p>
+            <h2>Traitement des cadeaux</h2>
             <span>
-              Payez au guichet les montants{" "}
-              {localStorage.getItem("ak_display_currency") || "AOA"} associes aux commandes ou le
-              client a choisi l'option revendre a AK Fashion Plus.
+              Traitez les cadeaux offerts aux beneficiaires au guichet.
             </span>
           </div>
           <button onClick={loadRows} type="button">
@@ -198,7 +196,7 @@ export default function ResalePayoutsPage(props: CashierPageProps) {
           <div className="cashier-panel-head">
             <div>
               <p>Guichet {localStorage.getItem("ak_display_currency") || "AOA"}</p>
-              <h3>Reventes a traiter</h3>
+              <h3>Cadeaux a traiter</h3>
             </div>
             <strong>{sortedRows.length}</strong>
           </div>
@@ -277,7 +275,7 @@ export default function ResalePayoutsPage(props: CashierPageProps) {
                 ))}
                 {!sortedRows.length ? (
                   <tr>
-                    <td colSpan={7}>Aucune revente trouvee.</td>
+                    <td colSpan={7}>Aucun cadeau trouve.</td>
                   </tr>
                 ) : null}
               </tbody>
@@ -322,7 +320,7 @@ export default function ResalePayoutsPage(props: CashierPageProps) {
             <form className="cashier-modal" onSubmit={paySelected}>
               <div className="cashier-panel-head">
                 <div>
-                  <p>Detail revente</p>
+                  <p>Detail du cadeau</p>
                   <h3>{selected.order_number}</h3>
                 </div>
                 <button onClick={() => setSelected(null)} type="button">

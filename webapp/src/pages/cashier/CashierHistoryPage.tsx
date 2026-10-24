@@ -21,7 +21,7 @@ function typeLabel(value: string) {
     order_pickup: "Retrait commande",
     rental: "Remise location",
     rental_return: "Retour location",
-    resale_payout: "Paiement revente",
+    resale_payout: "Traitement du cadeau",
   };
   return labels[value] || value;
 }

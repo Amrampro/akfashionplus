@@ -1,7 +1,7 @@
 // Shared by receipt builders and the PDF renderer; never translate customer data.
 const labels = {
   receipt: ['Reçu AK Fashion Plus', 'AK Fashion Plus receipt', 'Recibo AK Fashion Plus'],
-  order: ['Commande', 'Order', 'Encomenda'], rental: ['Location', 'Rental', 'Aluguer'], resale: ['Revente', 'Resale', 'Revenda'],
+  order: ['Commande', 'Order', 'Encomenda'], rental: ['Location', 'Rental', 'Aluguer'], resale: ['Cadeau offert', 'Gift offered', 'Presente oferecido'],
   reference: ['Référence', 'Reference', 'Referência'], type: ['Type', 'Type', 'Tipo'],
   customer: ['Client', 'Customer', 'Cliente'], beneficiary: ['Bénéficiaire', 'Recipient', 'Beneficiário'],
   address: ['Adresse', 'Address', 'Morada'], branch: ['Guichet', 'Counter', 'Balcão'],
@@ -13,7 +13,7 @@ const labels = {
   deliveryItem: ['Livraison article', 'Item delivery', 'Entrega do artigo'],
   pickupItem: ['Retrait article', 'Item collection', 'Levantamento do artigo'],
   rentalItem: ['Location article', 'Item rental', 'Aluguer do artigo'],
-  resalePayout: ['Retrait argent revente AK', 'AK resale payout', 'Pagamento de revenda AK'],
+  resalePayout: ['Cadeau au guichet', 'Gift at the counter', 'Presente no balcao'],
   item: ['Article', 'Item', 'Artigo'], variant: ['Variante', 'Variant', 'Variante'],
   start: ['Départ', 'Start', 'Início'], return: ['Retour prévu', 'Expected return', 'Devolução prevista'],
   days: ['Nombre de jours', 'Number of days', 'Número de dias'], dayUnit: ['jour(s)', 'day(s)', 'dia(s)'],
@@ -54,7 +54,7 @@ const values = {
   purchase: ['Achat', 'Purchase', 'Compra'], order: ['Commande', 'Order', 'Encomenda'],
   rental: ['Location', 'Rental', 'Aluguer'], rental_deposit: ['Caution de location', 'Rental deposit', 'Caução de aluguer'],
   rental_late_fee: ['Frais de retard', 'Late fee', 'Taxa de atraso'], rental_damage_fee: ['Frais de dommage', 'Damage fee', 'Taxa por danos'],
-  resale: ['Revente', 'Resale', 'Revenda'], refund: ['Remboursement', 'Refund', 'Reembolso'],
+  resale: ['Cadeau offert', 'Gift offered', 'Presente oferecido'], refund: ['Remboursement', 'Refund', 'Reembolso'],
 };
 
 export function normalizeReceiptLanguage(value) {

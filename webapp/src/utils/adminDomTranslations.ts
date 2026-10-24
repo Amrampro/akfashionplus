@@ -1,4 +1,6 @@
 import type { Language } from "../types";
+import enMessages from "../locales/en";
+import ptMessages from "../locales/pt";
 
 type TextMap = Record<string, string>;
 
@@ -135,9 +137,9 @@ const en: TextMap = {
   "Non recupere": "Not recovered",
   "Non retourne": "Not returned",
   "Reservee": "Reserved",
-  "Reventes AK": "AK resales",
-  "Reventes AK Fashion Plus": "AK Fashion Plus resales",
-  "Articles a revendre": "Items to resell",
+  "Cadeaux offerts": "Gifts offered",
+  "Cadeaux offerts AK Fashion Plus": "AK Fashion Plus gifts",
+  "Articles a offrir": "Gift items",
   "Operations": "Operations",
   "A recuperer / payer": "To recover / pay",
   "Recuperees": "Recovered",
@@ -240,20 +242,20 @@ const en: TextMap = {
   "Paiements locaux": "Local payouts",
   "Operations traitees": "Processed operations",
   "Details retrait": "Pickup details",
-  "Details revente": "Resale details",
+  "Details du cadeau": "Gift details",
   "Retraits a remettre": "Pickups to hand over",
   "Locations a traiter": "Rentals to process",
-  "Reventes a payer": "Resales to pay",
+  "Cadeaux a traiter": "Gifts to process",
   "Ouvrir les retraits": "Open pickups",
   "Aucun retrait prioritaire.": "No priority pickup.",
   "Aucune location urgente.": "No urgent rental.",
-  "Aucune revente a payer.": "No resale to pay.",
+  "Aucun cadeau a traiter.": "No gifts to process.",
   "Toutes les notifications sont marquees comme lues.": "All notifications are marked as read.",
   "Notifications recentes": "Recent notifications",
   "Aucune notification trouvee.": "No notification found.",
-  "Retour reventes": "Back to resales",
+  "Retour aux cadeaux": "Back to gifts",
   "Retour retraits": "Back to pickups",
-  "Aucune revente disponible.": "No resale available.",
+  "Aucun cadeau disponible.": "No gifts available.",
   "Aucun retrait disponible.": "No pickup available.",
   "Remise location": "Rental handover",
   "Retour location": "Rental return",
@@ -263,8 +265,7 @@ const en: TextMap = {
   "Toutes les locations": "All rentals",
   "Guichet non assigne": "Unassigned counter",
   "Aucune location trouvee.": "No rental found.",
-  "Reventes a traiter": "Resales to process",
-  "Aucune revente trouvee.": "No resale found.",
+  "Aucun cadeau trouve.": "No gifts found.",
   "Toutes les commandes": "All orders",
   "Aucune commande trouvee.": "No order found.",
   "Remise": "Handover",
@@ -405,9 +406,9 @@ const pt: TextMap = {
   "Non recupere": "Nao recuperado",
   "Non retourne": "Nao devolvido",
   "Reservee": "Reservada",
-  "Reventes AK": "Revendas AK",
-  "Reventes AK Fashion Plus": "Revendas AK Fashion Plus",
-  "Articles a revendre": "Artigos para revender",
+  "Cadeaux offerts": "Presentes oferecidos",
+  "Cadeaux offerts AK Fashion Plus": "Presentes AK Fashion Plus",
+  "Articles a offrir": "Artigos para oferecer",
   "Operations": "Operacoes",
   "A recuperer / payer": "A recuperar / pagar",
   "Recuperees": "Recuperadas",
@@ -510,20 +511,20 @@ const pt: TextMap = {
   "Paiements locaux": "Pagamentos locais",
   "Operations traitees": "Operacoes tratadas",
   "Details retrait": "Detalhes da retirada",
-  "Details revente": "Detalhes da revenda",
+  "Details du cadeau": "Detalhes do presente",
   "Retraits a remettre": "Retiradas a entregar",
   "Locations a traiter": "Alugueres a tratar",
-  "Reventes a payer": "Revendas a pagar",
+  "Cadeaux a traiter": "Presentes para tratar",
   "Ouvrir les retraits": "Abrir retiradas",
   "Aucun retrait prioritaire.": "Nenhuma retirada prioritaria.",
   "Aucune location urgente.": "Nenhum aluguer urgente.",
-  "Aucune revente a payer.": "Nenhuma revenda a pagar.",
+  "Aucun cadeau a traiter.": "Nenhum presente para tratar.",
   "Toutes les notifications sont marquees comme lues.": "Todas as notificacoes foram marcadas como lidas.",
   "Notifications recentes": "Notificacoes recentes",
   "Aucune notification trouvee.": "Nenhuma notificacao encontrada.",
-  "Retour reventes": "Voltar as revendas",
+  "Retour aux cadeaux": "Voltar aos presentes",
   "Retour retraits": "Voltar as retiradas",
-  "Aucune revente disponible.": "Nenhuma revenda disponivel.",
+  "Aucun cadeau disponible.": "Nenhum presente disponivel.",
   "Aucun retrait disponible.": "Nenhuma retirada disponivel.",
   "Remise location": "Entrega do aluguer",
   "Retour location": "Retorno do aluguer",
@@ -533,14 +534,16 @@ const pt: TextMap = {
   "Toutes les locations": "Todos os alugueres",
   "Guichet non assigne": "Guiche nao atribuido",
   "Aucune location trouvee.": "Nenhum aluguer encontrado.",
-  "Reventes a traiter": "Revendas a tratar",
-  "Aucune revente trouvee.": "Nenhuma revenda encontrada.",
+  "Aucun cadeau trouve.": "Nenhum presente encontrado.",
   "Toutes les commandes": "Todas as encomendas",
   "Aucune commande trouvee.": "Nenhuma encomenda encontrada.",
   "Remise": "Entrega",
   "Retour attendu": "Retorno esperado",
   "Retournee": "Devolvida",
 };
+
+Object.assign(en, {"Cadeaux offerts AK Fashion Plus":"AK Fashion Plus gifts","Cadeau offert AK Fashion Plus":"AK Fashion Plus gift","Cadeaux offerts":"Gifts offered","Cadeau offert":"Gift offered","Articles a offrir":"Gift items","Offrir un cadeau":"Offer a gift","offrir un cadeau":"offer a gift","Cadeau mis a jour.":"Gift updated.","Aucun cadeau trouve.":"No gifts found.","Aucun cadeau trouve":"No gifts found","Aucun cadeau disponible.":"No gifts available.","Aucun cadeau a traiter.":"No gifts to process.","Cadeaux a traiter":"Gifts to process","Traitement des cadeaux":"Gift processing","Traitement du cadeau":"Gift processing","Details du cadeau":"Gift details","Detail du cadeau":"Gift details","Retour aux cadeaux":"Back to gifts","Mes cadeaux offerts":"My gifts","Avec cadeau":"With gift","Sans cadeau":"Without gift","Cadeaux a recuperer":"Gifts to collect","Valeur des cadeaux":"Gift value","Synthese des cadeaux":"Gift summary","Cadeaux par guichet":"Gifts by counter"});
+Object.assign(pt, {"Cadeaux offerts AK Fashion Plus":"Presentes AK Fashion Plus","Cadeau offert AK Fashion Plus":"Presente AK Fashion Plus","Cadeaux offerts":"Presentes oferecidos","Cadeau offert":"Presente oferecido","Articles a offrir":"Artigos para oferecer","Offrir un cadeau":"Oferecer um presente","offrir un cadeau":"oferecer um presente","Cadeau mis a jour.":"Presente atualizado.","Aucun cadeau trouve.":"Nenhum presente encontrado.","Aucun cadeau trouve":"Nenhum presente encontrado","Aucun cadeau disponible.":"Nenhum presente disponivel.","Aucun cadeau a traiter.":"Nenhum presente para tratar.","Cadeaux a traiter":"Presentes para tratar","Traitement des cadeaux":"Tratamento dos presentes","Traitement du cadeau":"Tratamento do presente","Details du cadeau":"Detalhes do presente","Detail du cadeau":"Detalhes do presente","Retour aux cadeaux":"Voltar aos presentes","Mes cadeaux offerts":"Os meus presentes","Avec cadeau":"Com presente","Sans cadeau":"Sem presente","Cadeaux a recuperer":"Presentes para levantar","Valeur des cadeaux":"Valor dos presentes","Synthese des cadeaux":"Resumo dos presentes","Cadeaux par guichet":"Presentes por balcao"});
 
 const maps: Record<Exclude<Language, "fr">, TextMap> = { en, pt };
 const textOriginals = new WeakMap<Text, string>();
@@ -555,7 +558,8 @@ function replacePreservingWhitespace(value: string, translated: string) {
 
 function translateValue(value: string, language: Language) {
   if (language === "fr") return value;
-  return maps[language]?.[value.trim()] || value;
+  const messages: TextMap = language === "en" ? enMessages : ptMessages;
+  return messages[value.trim()] || maps[language]?.[value.trim()] || value;
 }
 
 export function translateAdminDom(root: ParentNode, language: Language) {

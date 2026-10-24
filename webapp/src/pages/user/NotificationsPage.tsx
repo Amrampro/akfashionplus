@@ -27,7 +27,7 @@ function typeLabel(value: string) {
     payment: "Paiement",
     pickup: "Retrait",
     rental: "Location",
-    resale: "Revente",
+    resale: "Cadeau offert",
     stock: "Stock",
   };
   return labels[value] || value;
@@ -97,7 +97,7 @@ export default function NotificationsPage() {
           <p className="eyebrow">Notifications</p>
           <h2>Mes notifications</h2>
           <span>
-            Retrouvez les alertes de commande, paiement, location, revente et
+            Retrouvez les alertes de commande, paiement, location, cadeau et
             cartes cadeaux.
           </span>
         </div>

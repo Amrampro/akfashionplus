@@ -7,8 +7,8 @@ export default function ResalesPage() {
   return (
     <PageShell
       area="Client"
-      title="Mes reventes"
-      description={`Demandes de revente a AK Fashion Plus avec estimation, validation et paiement ${displayCurrency}.`}
+      title="Mes cadeaux offerts"
+      description="Mes cadeaux offerts et leur statut de traitement."
       metrics={["Demandes", "Approuvees", "Payees", displayCurrency]}
     />
   );

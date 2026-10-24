@@ -80,13 +80,13 @@ export default {
     rentalTitle: "Alugue o seu look",
     rentalSubtitle: "Pecas disponiveis por dia",
     secondHandTitle: "Segunda mao",
-    resaleTitle: "Revender a AK Fashion Plus",
+    resaleTitle: "Oferecer um presente",
     resaleText: "Cambio atual: 1 EUR = {{rate}} {{currency}}.",
     resaleLearnMore: "Saber mais",
-    resaleModalEyebrow: "Revenda AK",
-    resaleModalTitle: "Como funciona a revenda?",
+    resaleModalEyebrow: "Presente oferecido",
+    resaleModalTitle: "Como oferecer um presente?",
     resaleModalText:
-      "No checkout, pode escolher revender a AK Fashion Plus. O beneficiario recebe o equivalente na moeda secundaria no balcao em Angola.",
+      "Ao finalizar a compra, escolha oferecer um presente. Sera preparado no balcao para o beneficiario.",
     resaleModalExampleLabel: "Exemplo",
     resaleModalExampleText:
       "Para 300 EUR em artigos, o beneficiario pode receber {{amount}} em Angola com o cambio ativo.",
@@ -283,6 +283,9 @@ export default {
     loginToBuy: "Entrar para comprar",
   },
   productDetails: {
+    rentalStartDate: "Data de início",
+    previousMonth: "Mês anterior",
+    nextMonth: "Mês seguinte",
     enlargeImage: "Ampliar imagem",
     previousImage: "Imagem anterior",
     nextImage: "Imagem seguinte",
@@ -441,8 +444,8 @@ export default {
     noRentalsTitle: "Nenhum aluguer ativo",
     noRentalsText: "Os seus alugueres reservados ou ativos aparecem aqui.",
     history: "Minha conta",
-    resales: "Revendas AK",
-    resalesDetail: "Artigos para revender",
+    resales: "Presentes oferecidos",
+    resalesDetail: "Artigos para oferecer",
     profileDetail: "Informacoes pessoais",
     notificationsDetail: "Mensagens",
     orderFallback: "Encomenda AK",
@@ -501,8 +504,8 @@ export default {
     body: "Os seus alugueres AK Fashion Plus aparecem com datas, devolucoes e caucoes.",
   },
   resalesPage: {
-    title: "Revendas",
-    body: "Os seus pedidos de revenda AK Fashion Plus aparecem com o estado de tratamento.",
+    title: "Presentes oferecidos",
+    body: "Os seus presentes oferecidos aparecem com o estado de tratamento.",
   },
   favoritesPage: {
     eyebrow: "Selecao",
@@ -532,7 +535,7 @@ export default {
   },
   ordersPage: {
     title: "Minhas encomendas",
-    guestText: "Entre para consultar compras, alugueres e revendas.",
+    guestText: "Entre para consultar compras, alugueres e presentes.",
     loadError: "Nao foi possivel carregar as encomendas.",
     displayed: "Apresentadas",
     resale: "Presente oferecido",

@@ -84,10 +84,10 @@ const moduleCopy: Record<
       "Surveillez les cartes actives, soldes, reserves et types vendus.",
   },
   "admin-resales": {
-    eyebrow: "Reventes",
-    title: "Reventes AK Fashion Plus",
+    eyebrow: "Cadeaux offerts",
+    title: "Cadeaux offerts AK Fashion Plus",
     description:
-      "Suivez les montants a reverser aux guichets et les operations par agence.",
+      "Suivez les cadeaux offerts, leur statut et leur retrait au guichet.",
   },
   "admin-payments": {
     eyebrow: "Finances",
@@ -489,12 +489,12 @@ function renderModule(page: string, data: AdminDashboardData) {
               aoa(data.resales.summary.payout_aoa),
             ],
           ]}
-          title="Synthese reventes"
+          title="Synthese des cadeaux"
         />
         <BarPanel
           labelKey="branch_name"
           rows={data.resales.by_branch}
-          title="Reventes par guichet"
+          title="Cadeaux par guichet"
           valueKey="payout_aoa"
         />
       </AdminGrid>

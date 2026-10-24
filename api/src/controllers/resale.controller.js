@@ -18,7 +18,7 @@ export async function listResales(req, res) {
 
 export async function updateResaleStatus(req, res) {
   if (!statuses.has(req.body.status))
-    return fail(res, 422, "Invalid resale status");
+    return fail(res, 422, "Invalid gift status");
   if (req.body.status === "paid")
     return fail(res, 422, "Use the payout endpoint to mark paid");
 
@@ -28,16 +28,16 @@ export async function updateResaleStatus(req, res) {
     notes: req.body.notes || null,
   });
 
-  return ok(res, null, "Resale updated");
+  return ok(res, null, "Gift updated");
 }
 
 export async function payResale(req, res) {
   await transaction(async (connection) => {
     const resale = await Resale.lockResale(req.params.id, connection);
     if (!resale)
-      throw Object.assign(new Error("Resale not found"), { status: 404 });
+      throw Object.assign(new Error("Gift not found"), { status: 404 });
     if (resale.status === "paid") {
-      throw Object.assign(new Error("Resale already paid"), { status: 409 });
+      throw Object.assign(new Error("Gift already processed"), { status: 409 });
     }
     if (
       req.user.role === "cashier" &&
@@ -59,7 +59,7 @@ export async function payResale(req, res) {
     );
   });
 
-  return ok(res, null, "Resale payout recorded");
+  return ok(res, null, "Gift processing recorded");
 }
 
 export default { listResales, updateResaleStatus, payResale };

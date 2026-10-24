@@ -25,6 +25,7 @@ import { useFavorites } from "../../hooks/useFavorites";
 import { get, post } from "../../services/api";
 import { absoluteImageUrl } from "../../utils/images";
 import ZoomableImage from "../../components/ZoomableImage";
+import RentalCalendar, { rentalDateKey } from "../../components/rental/RentalCalendar";
 
 type ProductSummary = {
   id: number;
@@ -169,6 +170,8 @@ export default function ProductDetailsScreen({ slug, onBack }: Props) {
   const [viewerSize, setViewerSize] = useState({ width: 0, height: 0 });
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
   const [rentalDays, setRentalDays] = useState(2);
+  const [rentalStartDate, setRentalStartDate] = useState(() => rentalDateKey(new Date()));
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [rentalModalOpen, setRentalModalOpen] = useState(false);
   const [purchaseAdded, setPurchaseAdded] = useState(false);
   const [favoriteMessage, setFavoriteMessage] = useState("");
@@ -242,8 +245,9 @@ export default function ProductDetailsScreen({ slug, onBack }: Props) {
 
   const addCurrentToCart = (itemType: "purchase" | "rental") => {
     if (!product) return;
-    const rentalStart = new Date();
-    const rentalEnd = new Date();
+    const [year, month, day] = rentalStartDate.split("-").map(Number);
+    const rentalStart = new Date(year, month - 1, day, 12);
+    const rentalEnd = new Date(rentalStart);
     rentalEnd.setDate(rentalStart.getDate() + rentalDays);
     addItem({
       product_id: product.id,
@@ -261,8 +265,8 @@ export default function ProductDetailsScreen({ slug, onBack }: Props) {
       rental_days: itemType === "rental" ? rentalDays : null,
       rental_price_per_day_eur: itemType === "rental" ? rentalPrice : null,
       rental_deposit_eur: itemType === "rental" ? deposit : null,
-      rental_start_date: itemType === "rental" ? rentalStart.toISOString().slice(0, 10) : null,
-      rental_end_date: itemType === "rental" ? rentalEnd.toISOString().slice(0, 10) : null,
+      rental_start_date: itemType === "rental" ? rentalDateKey(rentalStart) : null,
+      rental_end_date: itemType === "rental" ? rentalDateKey(rentalEnd) : null,
     });
   };
 
@@ -298,6 +302,11 @@ export default function ProductDetailsScreen({ slug, onBack }: Props) {
   };
 
   const handleRental = () => {
+    if (rentalStartDate < rentalDateKey(new Date())) {
+      setRentalStartDate(rentalDateKey(new Date()));
+      setCalendarOpen(true);
+      return;
+    }
     addCurrentToCart("rental");
     setRentalModalOpen(false);
   };
@@ -679,15 +688,21 @@ export default function ProductDetailsScreen({ slug, onBack }: Props) {
           </ModalSafeAreaView>
           </SafeAreaProvider>
         </Modal>
-        <Modal transparent visible={rentalModalOpen} animationType="fade">
+        <Modal transparent visible={rentalModalOpen} animationType="fade" onRequestClose={() => setRentalModalOpen(false)}>
           <View style={styles.modalOverlay}>
-            <View style={styles.rentalModal}>
+            <ScrollView style={[styles.rentalModal, { maxHeight: "90%", padding: 0, flexGrow: 0 }]} contentContainerStyle={{ padding: 16, gap: 12 }} keyboardShouldPersistTaps="handled">
               <Text style={styles.modalEyebrow}>{t("productDetails.rentalModalEyebrow")}</Text>
               <Text style={styles.modalTitle}>{product.name}</Text>
               <Text style={styles.modalText}>
                 {t("productDetails.rentalModalText")}
               </Text>
               <View style={styles.rentalDaysBox}>
+                <Text style={styles.rentalDaysLabel}>{t("productDetails.rentalStartDate")}</Text>
+                <TouchableOpacity style={[styles.modalCancelButton, { flex: 0 }]} onPress={() => setCalendarOpen((open) => !open)}
+                  accessibilityRole="button" accessibilityLabel={t("productDetails.rentalStartDate")}>
+                  <Text style={styles.modalCancelText}>{new Date(`${rentalStartDate}T12:00:00`).toLocaleDateString(locale, { dateStyle: "long" })}</Text>
+                </TouchableOpacity>
+                {calendarOpen ? <RentalCalendar value={rentalStartDate} onChange={(date) => { setRentalStartDate(date); setCalendarOpen(false); }} /> : null}
                 <Text style={styles.rentalDaysLabel}>{t("productDetails.rentalDaysLabel")}</Text>
                 <View style={styles.stepper}>
                   <TouchableOpacity
@@ -730,7 +745,7 @@ export default function ProductDetailsScreen({ slug, onBack }: Props) {
                   <Text style={styles.modalConfirmText}>{t("productDetails.addToCart")}</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </ScrollView>
           </View>
         </Modal>
       </View>

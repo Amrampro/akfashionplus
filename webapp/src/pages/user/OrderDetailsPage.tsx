@@ -219,7 +219,7 @@ export default function OrderDetailsPage({ go }: { go: (page: string) => void })
           <strong>{label(paymentStatusLabels, order.payment_status)}</strong>
         </article>
         <article>
-          <span>Revente AK</span>
+          <span>Cadeau offert</span>
           <strong>{resaleItems.length ? formatAoa(resaleTotal) : "-"}</strong>
           <small>{resaleItems.length} article(s)</small>
         </article>
@@ -290,7 +290,7 @@ export default function OrderDetailsPage({ go }: { go: (page: string) => void })
               <strong>{formatEur(item.line_total_eur)}</strong>
               {item.resale_id && (
                 <div className="user-resale-card">
-                  <span>Revente AK Fashion Plus</span>
+                  <span>Cadeau offert AK Fashion Plus</span>
                   <strong>{formatAoa(item.resale_payout_amount_aoa)}</strong>
                   <small>Valeur article: {formatEur(item.resale_amount_eur)}</small>
                   <small>
