@@ -8,6 +8,7 @@ import {
 import { useLanguage } from "./hooks/useLanguage";
 import { Eye, EyeOff } from "lucide-react";
 import ContactPage from "./pages/public/ContactPage";
+import TermsPage from "./pages/public/TermsPage";
 import PasswordResetPage from "./pages/public/PasswordResetPage";
 import { absoluteImageUrl } from "./utils/images";
 import FaqPage from "./pages/public/FaqPage";
@@ -136,6 +137,7 @@ const routes: Record<string, string> = {
   "gift-cards": "/gift-cards",
   faq: "/faq",
   contact: "/contact",
+  terms: "/termes-et-conditions",
   "important-link": "/important-links",
   cart: "/cart",
   checkout: "/checkout",
@@ -1078,6 +1080,10 @@ function App() {
 
     if (page === "contact") {
       return <ContactPage go={go} language={language} />;
+    }
+
+    if (page === "terms") {
+      return <TermsPage />;
     }
 
     if (page.startsWith("important-link-")) {
@@ -2799,8 +2805,10 @@ function Footer({
         </section>
       ) : null}
       <section className="footer-bottom">
-        <span>AK Fashion Plus</span>
-        <span>{text("Votre style, notre engagement.")}</span>
+        <span>© {new Date().getFullYear()} AK Fashion Plus. {text("Tous droits réservés.")}</span>
+        <a href={pageToPath("terms")} onClick={(event) => handleNav(event, "terms", go)}>
+          Termes et conditions
+        </a>
       </section>
     </footer>
   );

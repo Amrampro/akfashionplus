@@ -399,6 +399,22 @@ input:focus {
   padding: 28px clamp(18px, 4vw, 52px) 52px;
 }
 
+.terms-page { max-width: 1400px; margin: 0 auto; }
+.terms-toc, .terms-content { padding: clamp(20px, 4vw, 44px); background: #fff; border: 1px solid #e6dfd3; border-radius: 8px; }
+.terms-toc ol { columns: 2 280px; padding-left: 24px; }
+.terms-toc li { break-inside: avoid; margin-bottom: 12px; padding-left: 6px; }
+.terms-toc a { color: #071846; line-height: 1.6; }
+.terms-content { max-width: 920px; width: 100%; box-sizing: border-box; justify-self: center; }
+.terms-content section { scroll-margin-top: 120px; }
+.terms-content section + section { margin-top: 36px; padding-top: 24px; border-top: 1px solid #e6dfd3; }
+.terms-content h2 { color: #071846; font-size: clamp(18px, 2.5vw, 24px); line-height: 1.4; overflow-wrap: anywhere; }
+.terms-content p, .terms-identity { font-size: 16px; line-height: 1.85; overflow-wrap: anywhere; }
+.terms-identity div { margin-bottom: 16px; }
+.terms-identity dt { font-weight: 700; }
+.terms-identity dd { margin: 0; }
+.footer-bottom a { color: inherit; text-underline-offset: 4px; }
+.footer-bottom a:hover { color: #f5d27c; }
+
 .info-hero {
   display: grid;
   gap: 14px;
