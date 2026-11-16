@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { appConfig } from "../../config/app";
 import { useLanguage } from "../../hooks/useLanguage";
-import { ArrowUpRight, Pause, Play } from "lucide-react";
+import { ArrowUpRight, ImageOff, Pause, Play } from "lucide-react";
 import FashionScene from "../../components/home/FashionScene";
 import "../../components/home/home-motion.css";
 
@@ -403,13 +403,36 @@ function HeroBanner({
 }
 
 function CategoryShowcase({ go }: { go: (page: string) => void }) {
-  const categories = [
-    ["Femmes", "Robes, ensembles, sacs et soiree", "shop", "cat-women"],
-    ["Hommes", "Costumes, chemises et elegance", "shop", "cat-men"],
-    ["Robes", "Satin, gala, mariage, ceremonies", "shop", "cat-dresses"],
-    ["Costumes", "Professionnel et evenementiel", "rental", "cat-suits"],
-    ["Accessoires", "Sacs, bijoux, chaussures", "shop", "cat-accessories"],
-  ];
+  const { language } = useLanguage();
+  const [categories, setCategories] = useState<Array<{
+    id: number; name: string; description: string | null; image_url: string | null;
+  }>>([]);
+  const [status, setStatus] = useState("loading");
+  const [attempt, setAttempt] = useState(0);
+  const [failedImages, setFailedImages] = useState<string[]>([]);
+  const copy = language === "pt"
+    ? { loading: "A carregar categorias...", error: "Nao foi possivel carregar as categorias.", retry: "Tentar novamente", empty: "Nenhuma categoria disponivel.", image: "Imagem indisponivel" }
+    : language === "en"
+      ? { loading: "Loading categories...", error: "Categories could not be loaded.", retry: "Try again", empty: "No categories available.", image: "Image unavailable" }
+      : { loading: "Chargement des categories...", error: "Impossible de charger les categories.", retry: "Reessayer", empty: "Aucune categorie disponible.", image: "Image indisponible" };
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`${API_URL}/categories?lang=${language}`, { signal: controller.signal })
+      .then(async (response) => {
+        const payload = await response.json();
+        if (!response.ok || payload.success === false || !Array.isArray(payload.data)) {
+          throw new Error("Categories unavailable");
+        }
+        if (!controller.signal.aborted) {
+          setCategories(payload.data);
+          setFailedImages([]);
+          setStatus("ready");
+        }
+      })
+      .catch(() => { if (!controller.signal.aborted) setStatus("error"); });
+    return () => controller.abort();
+  }, [language, attempt]);
 
   return (
     <MotionSection className="home-section">
@@ -417,19 +440,24 @@ function CategoryShowcase({ go }: { go: (page: string) => void }) {
         eyebrow="Categories principales"
         title="Accedez directement a vos univers"
       />
-      <div className="home-category-grid">
-        {categories.map(([title, text, page, tone]) => (
+      {status === "loading" && <p role="status">{copy.loading}</p>}
+      {status === "error" && <p role="status">{copy.error} <button type="button" onClick={() => { setStatus("loading"); setAttempt(attempt + 1); }}>{copy.retry}</button></p>}
+      {status === "ready" && categories.length === 0 && <p>{copy.empty}</p>}
+      <div className="home-category-grid home-live-categories">
+        {categories.map((category) => (
           <motion.button
-            key={title}
-            onClick={() => go(page)}
+            key={category.id}
+            onClick={() => go("shop")}
             type="button"
             whileHover={{ y: -6 }}
             whileTap={{ scale: 0.985 }}
           >
-            <ProductVisual tone={tone} />
+            {category.image_url && !failedImages.includes(category.image_url) ? (
+              <img className="home-category-image" src={new URL(category.image_url, `${API_URL.replace(/\/api\/?$/, "")}/`).href} alt={category.name} loading="lazy" onError={() => setFailedImages((previous) => [...previous, category.image_url!])} />
+            ) : <span className="home-category-missing"><ImageOff size={32} aria-hidden="true" /><span>{copy.image}</span></span>}
             <span className="home-category-copy">
-              <strong>{title}</strong>
-              <small>{text}</small>
+              <strong>{category.name}</strong>
+              {category.description && <small>{category.description}</small>}
               <i aria-hidden="true">&rarr;</i>
             </span>
           </motion.button>

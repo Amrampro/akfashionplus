@@ -1,4 +1,10 @@
 .home-page.home-immersive { background: #fff; grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.home-live-categories .home-category-image { position: absolute; inset: 0 0 118px; width: 100%; height: calc(100% - 118px); object-fit: cover; object-position: center; }
+.home-live-categories .home-category-copy { position: relative; margin-top: auto; width: 100%; box-sizing: border-box; }
+.home-category-grid.home-live-categories button { display: flex; flex-direction: column; }
+.home-category-grid.home-live-categories button::after { content: none; }
+.home-live-categories button .home-category-missing { position: absolute; inset: 0 0 118px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #626575; background: #f5f5f7; font-size: 13px; }
+.home-live-categories .home-category-missing span { color: inherit; }
 .home-editorial { color: var(--ak-navy, #071846); min-width: 0; }
 .home-editorial-hero { position: relative; height: min(740px, calc(100svh - 175px)); min-height: 540px; overflow: hidden; background: #f5f5f7; }
 .fashion-scene { position: absolute; inset: 0; }
