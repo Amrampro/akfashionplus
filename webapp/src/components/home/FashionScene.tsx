@@ -24,14 +24,14 @@ export default function FashionScene({ paused }: { paused: boolean }) {
       if (cancelled) return;
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
-      renderer.setClearColor(0xf1f3f0);
+      renderer.setClearColor(0xf5f5f7);
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.05;
       element!.appendChild(renderer.domElement);
       const scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(0xf1f3f0, 15, 30);
+      scene.fog = new THREE.Fog(0xf5f5f7, 15, 30);
       const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 60);
       const pmrem = new THREE.PMREMGenerator(renderer);
       const room = new RoomEnvironment();
@@ -40,7 +40,7 @@ export default function FashionScene({ paused }: { paused: boolean }) {
       scene.environmentIntensity = 0.65;
       room.dispose();
       pmrem.dispose();
-      scene.add(new THREE.HemisphereLight(0xffffff, 0x849389, 1.4));
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x9295a3, 1.4));
       const light = new THREE.DirectionalLight(0xfff7e7, 2.5);
       light.position.set(-3, 8, 6);
       light.castShadow = true;
@@ -52,17 +52,17 @@ export default function FashionScene({ paused }: { paused: boolean }) {
       light.shadow.normalBias = 0.03;
       scene.add(light);
 
-      const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({ color: 0xf1f3f0, roughness: 0.9 }));
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({ color: 0xf5f5f7, roughness: 0.9 }));
       floor.rotation.x = -Math.PI / 2;
       floor.position.y = -1.9;
       floor.receiveShadow = true;
       scene.add(floor);
       const installation = new THREE.Group();
       scene.add(installation);
-      const gold = new THREE.MeshStandardMaterial({ color: 0xc8a346, metalness: 0.8, roughness: 0.28 });
-      const ink = new THREE.MeshStandardMaterial({ color: 0x163d35, roughness: 0.52 });
+      const gold = new THREE.MeshStandardMaterial({ color: 0xdcae21, metalness: 0.8, roughness: 0.28 });
+      const ink = new THREE.MeshStandardMaterial({ color: 0x071846, roughness: 0.52 });
       const paper = new THREE.MeshStandardMaterial({ color: 0xfaf9f5, roughness: 0.76 });
-      const wine = new THREE.MeshStandardMaterial({ color: 0x692d3c, roughness: 0.5 });
+      const navy = new THREE.MeshStandardMaterial({ color: 0x071846, roughness: 0.5 });
       const textures: InstanceType<typeof THREE.Texture>[] = [];
 
       function mesh(geometry: NonNullable<ConstructorParameters<typeof THREE.Mesh>[0]>, material: InstanceType<typeof THREE.Material>, parent = installation) {
@@ -86,7 +86,7 @@ export default function FashionScene({ paused }: { paused: boolean }) {
         ctx.fillText("AK", 512, 350);
         ctx.font = "36px Georgia";
         ctx.fillText("FASHION PLUS", 512, 432);
-        ctx.fillStyle = "#b3974d";
+        ctx.fillStyle = "#dcae21";
         ctx.fillRect(454, 477, 116, 3);
         ctx.font = "18px sans-serif";
         ctx.fillText("STYLE. QUALITY. YOU.", 512, 530);
@@ -120,10 +120,10 @@ export default function FashionScene({ paused }: { paused: boolean }) {
         return group;
       }
 
-      const largeBag = bag(paper, wordmark("#faf9f5", "#14382f"), 1.17);
+      const largeBag = bag(paper, wordmark("#faf9f5", "#071846"), 1.17);
       largeBag.position.set(0.5, 0.2, 0);
       largeBag.rotation.set(-0.05, -0.3, -0.09);
-      const smallBag = bag(wine, wordmark("#692d3c", "#fff8eb"), 0.71);
+      const smallBag = bag(navy, wordmark("#071846", "#ffffff"), 0.71);
       smallBag.position.set(-1.45, -0.45, -0.85);
       smallBag.rotation.set(0, 0.3, 0.12);
 
