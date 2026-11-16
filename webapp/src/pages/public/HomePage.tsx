@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { appConfig } from "../../config/app";
 import { useLanguage } from "../../hooks/useLanguage";
+import { ArrowUpRight, Pause, Play } from "lucide-react";
+import FashionScene from "../../components/home/FashionScene";
+import "../../components/home/home-motion.css";
 
 type CartProduct = {
   id: number;
@@ -258,7 +261,7 @@ export default function HomePage({
   }, [latestProducts]);
 
   return (
-    <section className="home-page">
+    <section className="home-page home-immersive">
       <HeroBanner
         displayCurrency={displayCurrency}
         go={go}
@@ -348,67 +351,53 @@ function HeroBanner({
   product?: HomeProduct;
 }) {
   const reduceMotion = useReducedMotion();
+  const { language } = useLanguage();
+  const [manualPause, setManualPause] = useState(false);
+  const paused = Boolean(reduceMotion) || manualPause;
+  const copy = language === "pt" ? {
+    tag: "ESTILO. QUALIDADE. VOCE.", description: "Uma nova perspetiva sobre o seu estilo. Moda, aluguer e presentes, da Europa a Angola.", shop: "Explorar a loja", collection: "Ver a colecao", selection: "Em destaque", pause: "Pausar animacoes", play: "Retomar animacoes", band: ["Moda para cada momento", "Compra e aluguer", "Presentes com significado", "Europa e Angola"]
+  } : language === "en" ? {
+    tag: "STYLE. QUALITY. YOU.", description: "A fresh perspective on your style. Fashion, rentals and gifts, from Europe to Angola.", shop: "Explore the shop", collection: "View collection", selection: "In the spotlight", pause: "Pause animations", play: "Resume animations", band: ["Style for every moment", "Shop and rent", "Meaningful gifts", "Europe and Angola"]
+  } : {
+    tag: "LE STYLE. LA QUALITE. VOUS.", description: "Une nouvelle perspective sur votre style. Mode, location et cadeaux, de l'Europe a l'Angola.", shop: "Explorer la boutique", collection: "Voir la collection", selection: "A la une", pause: "Mettre les animations en pause", play: "Reprendre les animations", band: ["Le style pour chaque instant", "Achat et location", "Des cadeaux qui comptent", "Europe et Angola"]
+  };
 
   return (
-    <section className="home-hero-banner">
+    <section className="home-editorial" data-paused={paused}>
+    <div className="home-editorial-hero">
+      <FashionScene paused={paused} />
       <motion.div
         animate={{ opacity: 1, y: 0 }}
-        className="home-hero-copy"
+        className="home-editorial-copy"
         initial={reduceMotion ? false : { opacity: 0, y: 28 }}
         transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
       >
-        <p className="eyebrow">Nouvelle collection</p>
-        <h1>Le style qui traverse les frontieres</h1>
-        <p>
-          Robes, costumes, accessoires, location premium et cartes cadeaux pour
-          connecter votre style entre l'Europe et l'Angola.
-        </p>
-        <div className="home-hero-proof">
-          <span>
-            <strong>EUR/{displayCurrency || "AOA"}</strong>
-            Prix transparents
-          </span>
-          <span>
-            <strong>Retrait</strong>
-            Guichet securise
-          </span>
-          <span>
-            <strong>Premium</strong>
-            Achat ou location
-          </span>
-        </div>
-        <div className="home-actions">
+        <p className="home-editorial-eyebrow">{copy.tag}</p>
+        <h1>AK Fashion<br /><em>Plus</em><span>.</span></h1>
+        <p className="home-editorial-description">{copy.description}</p>
+        <div className="home-editorial-actions">
           <button onClick={() => go("shop")} type="button">
-            Acheter maintenant
+            {copy.shop}<ArrowUpRight size={19} />
           </button>
-          <button className="ghost" onClick={() => go("new")} type="button">
-            Decouvrir la collection
+          <button className="home-editorial-link" onClick={() => go("new")} type="button">
+            {copy.collection}<ArrowUpRight size={17} />
           </button>
         </div>
       </motion.div>
-      <motion.div
-        animate={{ opacity: 1, scale: 1 }}
-        className="home-hero-visual"
-        initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
-        transition={{ delay: 0.12, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        aria-label="Collection AK Fashion Plus"
-      >
-        {product?.image_url ? (
-          <img src={product.image_url} alt={product.name} />
-        ) : (
-          <ProductVisual tone="hero-main-dress" />
-        )}
-        <div className="home-hero-mark">
-          <span>AK+</span>
-          <strong>Collection signature</strong>
-          <small>Shopping. Location. Seconde main.</small>
-        </div>
-        <aside>
-          <strong>Selection du jour</strong>
-          <span>{product?.name || "Elegance contemporaine"}</span>
-          <small>{product?.category_name || "Disponible achat et location"}</small>
-        </aside>
-      </motion.div>
+      <div className="home-editorial-bottom">
+        <span>EUR / {displayCurrency || "Kwanza"}</span>
+        {product && <button className="home-editorial-product" onClick={() => go(`product-${product.slug}`)} type="button">
+          {product.image_url && <img src={product.image_url} alt="" />}
+          <span><small>{copy.selection}</small><strong>{product.name}</strong></span><ArrowUpRight size={18} />
+        </button>}
+        <button className="home-motion-toggle" type="button" disabled={Boolean(reduceMotion)} aria-pressed={paused} aria-label={paused ? copy.play : copy.pause} title={paused ? copy.play : copy.pause} onClick={() => setManualPause(!manualPause)}>
+          {paused ? <Play size={17} /> : <Pause size={17} />}
+        </button>
+      </div>
+    </div>
+    <div className="home-editorial-ribbon"><div className="home-ribbon-track">
+      {[0, 1].map((repeat) => <div key={repeat} aria-hidden={repeat === 1}>{copy.band.map((label) => <span key={label}>{label}<span className="home-ribbon-mark">+</span></span>)}</div>)}
+    </div></div>
     </section>
   );
 }
