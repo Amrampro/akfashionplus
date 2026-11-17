@@ -546,7 +546,10 @@ Object.assign(en, {"Cadeaux offerts AK Fashion Plus":"AK Fashion Plus gifts","Ca
 Object.assign(pt, {"Cadeaux offerts AK Fashion Plus":"Presentes AK Fashion Plus","Cadeau offert AK Fashion Plus":"Presente AK Fashion Plus","Cadeaux offerts":"Presentes oferecidos","Cadeau offert":"Presente oferecido","Articles a offrir":"Artigos para oferecer","Offrir un cadeau":"Oferecer um presente","offrir un cadeau":"oferecer um presente","Cadeau mis a jour.":"Presente atualizado.","Aucun cadeau trouve.":"Nenhum presente encontrado.","Aucun cadeau trouve":"Nenhum presente encontrado","Aucun cadeau disponible.":"Nenhum presente disponivel.","Aucun cadeau a traiter.":"Nenhum presente para tratar.","Cadeaux a traiter":"Presentes para tratar","Traitement des cadeaux":"Tratamento dos presentes","Traitement du cadeau":"Tratamento do presente","Details du cadeau":"Detalhes do presente","Detail du cadeau":"Detalhes do presente","Retour aux cadeaux":"Voltar aos presentes","Mes cadeaux offerts":"Os meus presentes","Avec cadeau":"Com presente","Sans cadeau":"Sem presente","Cadeaux a recuperer":"Presentes para levantar","Valeur des cadeaux":"Valor dos presentes","Synthese des cadeaux":"Resumo dos presentes","Cadeaux par guichet":"Presentes por balcao"});
 
 const maps: Record<Exclude<Language, "fr">, TextMap> = { en, pt };
-const textOriginals = new WeakMap<Text, string>();
+en["Total des utilisateurs"] = "Total users";
+pt["Total des utilisateurs"] = "Total de utilizadores";
+
+const textTranslations = new WeakMap<Text, { original: string; rendered: string }>();
 const attrOriginals = new WeakMap<Element, Record<string, string>>();
 const translatableAttrs = ["placeholder", "aria-label", "title"] as const;
 
@@ -579,11 +582,15 @@ export function translateAdminDom(root: ParentNode, language: Language) {
   while (walker.nextNode()) textNodes.push(walker.currentNode as Text);
 
   textNodes.forEach((node) => {
-    const original = textOriginals.get(node) || node.textContent || "";
-    textOriginals.set(node, original);
+    const current = node.textContent || "";
+    const previous = textTranslations.get(node);
+    const original = previous && current === previous.rendered
+      ? previous.original
+      : current;
     const translated = translateValue(original, language);
     const nextText = replacePreservingWhitespace(original, translated);
-    if (node.textContent !== nextText) node.textContent = nextText;
+    textTranslations.set(node, { original, rendered: nextText });
+    if (current !== nextText) node.textContent = nextText;
   });
 
   root.querySelectorAll?.("*").forEach((element) => {

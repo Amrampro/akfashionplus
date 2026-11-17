@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
-import { get, post, put } from "../../services/api";
+import { get, getWithMeta, post, put } from "../../services/api";
 
 type AdminUsersPageProps = {
   go: (page: string) => void;
@@ -146,6 +146,7 @@ export default function UsersPage({
   sessionName,
 }: AdminUsersPageProps) {
   const [users, setUsers] = useState<UserRow[]>([]);
+  const [totalUsers, setTotalUsers] = useState<number | null>(null);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [search, setSearch] = useState("");
   const [role, setRole] = useState("all");
@@ -172,8 +173,11 @@ export default function UsersPage({
   function loadUsers() {
     setLoading(true);
     setError("");
-    get<UserRow[]>("/users?limit=100")
-      .then((rows) => setUsers(rows || []))
+    getWithMeta<UserRow[], { total: number }>("/users?limit=100")
+      .then(({ data, meta }) => {
+        setUsers(data || []);
+        setTotalUsers(meta?.total ?? null);
+      })
       .catch((requestError: Error) => setError(requestError.message))
       .finally(() => setLoading(false));
   }
@@ -209,7 +213,6 @@ export default function UsersPage({
 
   const stats = useMemo(
     () => ({
-      users: users.filter((user) => user.role === "user").length,
       cashiers: users.filter((user) => user.role === "cashier").length,
       admins: users.filter((user) => user.role === "admin").length,
       blocked: users.filter((user) => user.status === "blocked").length,
@@ -313,8 +316,8 @@ export default function UsersPage({
 
         <section className="admin-product-kpis">
           <article>
-            <span>Utilisateurs</span>
-            <strong>{loading ? "..." : stats.users}</strong>
+            <span>Total des utilisateurs</span>
+            <strong>{totalUsers ?? (loading ? "..." : "—")}</strong>
           </article>
           <article>
             <span>Employes guichet</span>

@@ -4,6 +4,13 @@ export async function apiRequest<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
+  return (await requestWithMeta<T>(path, options)).data;
+}
+
+async function requestWithMeta<T, M = unknown>(
+  path: string,
+  options: RequestInit = {},
+): Promise<{ data: T; meta?: M }> {
   const token =
     localStorage.getItem("ak_auth_token") || localStorage.getItem("ak_token");
   const language = localStorage.getItem("ak_language") || "pt";
@@ -20,10 +27,11 @@ export async function apiRequest<T>(
   if (!response.ok || payload.success === false) {
     throw new Error(payload.message || "Request failed");
   }
-  return payload.data as T;
+  return { data: payload.data as T, meta: payload.meta as M | undefined };
 }
 
 export const get = <T>(path: string) => apiRequest<T>(path);
+export const getWithMeta = <T, M>(path: string) => requestWithMeta<T, M>(path);
 export const post = <T>(path: string, body?: unknown) =>
   apiRequest<T>(path, { method: "POST", body: JSON.stringify(body || {}) });
 export const put = <T>(path: string, body?: unknown) =>
