@@ -9,6 +9,7 @@ import { useLanguage } from "./hooks/useLanguage";
 import { Eye, EyeOff } from "lucide-react";
 import ContactPage from "./pages/public/ContactPage";
 import TermsPage from "./pages/public/TermsPage";
+import PrivacyPage from "./pages/public/PrivacyPage";
 import PasswordResetPage from "./pages/public/PasswordResetPage";
 import { absoluteImageUrl } from "./utils/images";
 import FaqPage from "./pages/public/FaqPage";
@@ -138,6 +139,7 @@ const routes: Record<string, string> = {
   faq: "/faq",
   contact: "/contact",
   terms: "/termes-et-conditions",
+  privacy: "/politique-de-confidentialite",
   "important-link": "/important-links",
   cart: "/cart",
   checkout: "/checkout",
@@ -1084,6 +1086,10 @@ function App() {
 
     if (page === "terms") {
       return <TermsPage />;
+    }
+
+    if (page === "privacy") {
+      return <PrivacyPage />;
     }
 
     if (page.startsWith("important-link-")) {
@@ -2806,9 +2812,14 @@ function Footer({
       ) : null}
       <section className="footer-bottom">
         <span>© {new Date().getFullYear()} AK Fashion Plus. {text("Tous droits réservés.")}</span>
+        <nav className="footer-legal-links" aria-label={language === "pt" ? "Informações legais" : language === "en" ? "Legal information" : "Informations légales"}>
         <a href={pageToPath("terms")} onClick={(event) => handleNav(event, "terms", go)}>
           Termes et conditions
         </a>
+        <a href={pageToPath("privacy")} onClick={(event) => handleNav(event, "privacy", go)} data-no-translate>
+          {language === "pt" ? "Política de privacidade" : language === "en" ? "Privacy policy" : "Politique de confidentialité"}
+        </a>
+        </nav>
       </section>
     </footer>
   );

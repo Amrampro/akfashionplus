@@ -414,6 +414,19 @@ input:focus {
 .terms-identity dd { margin: 0; }
 .footer-bottom a { color: inherit; text-underline-offset: 4px; }
 .footer-bottom a:hover { color: #f5d27c; }
+.footer-legal-links { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; border: 0; padding: 0; background: transparent; }
+.privacy-header { padding: 24px 0; border-bottom: 2px solid #dcae21; color: #071846; }
+.privacy-header h1 { font-family: Georgia, serif; font-size: 42px; line-height: 1.15; letter-spacing: 0; overflow-wrap: anywhere; }
+.privacy-header p { line-height: 1.6; }
+.privacy-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.privacy-tabs button { padding: 12px 20px; border: 1px solid #071846; border-radius: 4px; color: #071846; background: white; font-weight: 700; cursor: pointer; }
+.privacy-tabs button[aria-selected="true"] { color: white; background: #071846; border-bottom: 3px solid #dcae21; }
+.privacy-page :focus-visible { outline: 3px solid #dcae21; outline-offset: 4px; }
+.privacy-page [role="tabpanel"] { display: grid; gap: 26px; min-width: 0; }
+.privacy-page .terms-toc { display: block; }
+.privacy-page .terms-content h2 { font-size: 24px; }
+.privacy-page .terms-content a { color: #071846; text-underline-offset: 4px; }
+@media (max-width: 600px) { .privacy-header h1 { font-size: 32px; } .privacy-tabs button { padding: 12px 14px; } .privacy-page .terms-content h2 { font-size: 21px; } }
 
 .info-hero {
   display: grid;
