@@ -1,5 +1,31 @@
-import { query } from "../config/database.js";
+import { query, transaction } from "../config/database.js";
 import crypto from "node:crypto";
+
+// Keep only an anonymous reference for commercial records with restrictive FKs.
+// Personal profile data and user-generated content are permanently removed.
+export async function deleteOwnAccount(id) {
+  return transaction(async (connection) => {
+    const [users] = await connection.execute("SELECT email, avatar_url FROM users WHERE id = :id FOR UPDATE", { id });
+    if (!users.length) return [];
+    const [images] = await connection.execute(`SELECT i.image_url FROM second_hand_proposal_images i
+      JOIN second_hand_proposals p ON p.id = i.proposal_id WHERE p.user_id = :id`, { id });
+    await connection.execute("DELETE FROM password_reset_tokens WHERE email = :email", { email: users[0].email });
+    for (const table of ["user_addresses", "favorites", "notifications", "product_reviews", "carts", "second_hand_proposals"]) {
+      await connection.execute(`DELETE FROM ${table} WHERE user_id = :id`, { id });
+    }
+    await connection.execute(`UPDATE users SET first_name = 'Deleted', last_name = 'Account',
+      email = :email, phone = NULL, password_hash = :password,
+      avatar_url = NULL, country_code = NULL, referral_code = NULL,
+      referred_by_user_id = NULL, branch_id = NULL, role = 'user',
+      email_verified_at = NULL, last_login_at = NULL, status = 'inactive'
+      WHERE id = :id`, {
+      id, email: `deleted-${crypto.randomUUID()}@deleted.invalid`,
+      password: crypto.randomBytes(64).toString("hex"),
+    });
+    await connection.execute("UPDATE users SET referred_by_user_id = NULL WHERE referred_by_user_id = :id", { id });
+    return [users[0].avatar_url, ...images.map((image) => image.image_url)].filter(Boolean);
+  });
+}
 
 const userColumns = [
   "role",

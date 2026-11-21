@@ -2,6 +2,7 @@ import { uploadUrl } from "../utils/publicUrls.js";
 import { created, fail, ok } from "../utils/apiResponse.js";
 import { hashPassword } from "../utils/password.js";
 import * as User from "../models/user.model.js";
+import { removeAccountUploads } from "../services/accountUploads.service.js";
 
 function sanitizeUser(user) {
   if (!user) return null;
@@ -41,6 +42,12 @@ function pick(body, fields) {
 export async function getProfile(req, res) {
   const user = await User.ensureReferralCode(await User.findUserById(req.user.id));
   return ok(res, sanitizeUser(user));
+}
+
+export async function deleteProfile(req, res) {
+  const uploads = await User.deleteOwnAccount(req.user.id);
+  await removeAccountUploads(uploads);
+  return ok(res, null, "Account deleted");
 }
 
 export async function updateProfile(req, res) {

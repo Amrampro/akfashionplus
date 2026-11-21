@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { theme } from "../../config/theme";
+import LanguageSelector from "../../components/LanguageSelector";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../hooks/useAuth";
 import { useCart } from "../../hooks/useCart";
@@ -521,12 +522,13 @@ export default function HomeScreen({
         <View style={styles.appTopbar}>
           <View style={styles.brandBlock}>
             <Text style={styles.logoAk}>AK</Text>
-            <View>
-              <Text style={styles.brandName}>AK Fashion Plus</Text>
-              <Text style={styles.brandTagline}>Style. Quality. You.</Text>
+            <View style={{ flexShrink: 1 }}>
+              <Text style={styles.brandName} numberOfLines={1}>AK Fashion Plus</Text>
+              <Text style={styles.brandTagline} numberOfLines={1}>Style. Quality. You.</Text>
             </View>
           </View>
           <View style={styles.topActions}>
+            <LanguageSelector />
             <TouchableOpacity style={styles.iconButton} onPress={onOpenNotifications}>
               <HeaderIcon type="bell" />
               <View style={styles.notificationBadge}>
@@ -883,6 +885,8 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   brandBlock: {
+    flex: 1,
+    minWidth: 0,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
@@ -895,7 +899,7 @@ const styles = StyleSheet.create({
   },
   brandName: {
     color: "#071846",
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "900",
   },
   brandTagline: {

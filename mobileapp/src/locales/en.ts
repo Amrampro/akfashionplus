@@ -422,6 +422,11 @@ export default {
     },
   },
   account: {
+    language: "Choose language",
+    deleteTitle: "Delete account",
+    deleteConfirm: "Yes, delete my account",
+    deleteMessage: "Permanently delete your account? Your profile, addresses, favorites, reviews and second-hand proposals will be deleted. Order and payment records needed for legal obligations and ongoing transactions will be retained. This cannot be undone.",
+    deleteError: "Your account could not be deleted. Please try again.",
     loading: "Loading account...",
     guestEyebrow: "Customer account",
     guestTitle: "Sign in to your account.",

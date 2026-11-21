@@ -422,6 +422,11 @@ export default {
     },
   },
   account: {
+    language: "Escolher idioma",
+    deleteTitle: "Eliminar conta",
+    deleteConfirm: "Sim, eliminar a minha conta",
+    deleteMessage: "Deseja eliminar definitivamente a sua conta? O perfil, moradas, favoritos, avaliações e propostas de segunda mão serão eliminados. Os registos de encomendas e pagamentos necessários para obrigações legais e operações em curso serão conservados. Esta ação é irreversível.",
+    deleteError: "Não foi possível eliminar a conta. Tente novamente.",
     loading: "Carregando conta...",
     guestEyebrow: "Conta cliente",
     guestTitle: "Entre na sua conta.",

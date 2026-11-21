@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createUser,
+  deleteProfile,
   getProfile,
   listUsers,
   setUserStatus,
@@ -15,6 +16,7 @@ import { requireRole } from "../middlewares/role.middleware.js";
 const router = express.Router();
 
 router.get("/me", requireAuth, getProfile);
+router.delete("/me", requireAuth, deleteProfile);
 router.put("/me", requireAuth, updateProfile);
 router.post(
   "/me/avatar",

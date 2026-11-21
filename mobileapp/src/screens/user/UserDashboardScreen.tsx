@@ -1,6 +1,7 @@
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   ActivityIndicator,
   Image,
   Platform,
@@ -22,6 +23,8 @@ import { getGiftCards } from "../../services/giftCard.service";
 import { getOrders } from "../../services/order.service";
 import { getRentals } from "../../services/rental.service";
 import { absoluteImageUrl } from "../../utils/images";
+import { del } from "../../services/api";
+import { useCart } from "../../hooks/useCart";
 
 type Props = {
   onLogin: () => void;
@@ -252,6 +255,8 @@ export default function UserDashboardScreen({
   onOpenAdminSecondHandProposals,
 }: Props) {
   const { user, loading, logout } = useAuth();
+  const { clearCart } = useCart();
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const { locale, t } = useLanguage();
   const [dashboard, setDashboard] = useState<DashboardState>({
     orders: [],
@@ -347,6 +352,26 @@ export default function UserDashboardScreen({
   const handleLogout = async () => {
     await logout();
     onLogout();
+  };
+
+  const confirmDeleteAccount = () => {
+    if (deletingAccount) return;
+    Alert.alert(t("account.deleteTitle"), t("account.deleteMessage"), [
+      { text: t("common.cancel"), style: "cancel" },
+      { text: t("account.deleteConfirm"), style: "destructive", onPress: async () => {
+        setDeletingAccount(true);
+        try {
+          await del("/users/me");
+          clearCart();
+          await logout();
+          onLogout();
+        } catch {
+          Alert.alert(t("account.deleteTitle"), t("account.deleteError"));
+        } finally {
+          setDeletingAccount(false);
+        }
+      } },
+    ]);
   };
 
   const shareReferral = async () => {
@@ -563,6 +588,20 @@ export default function UserDashboardScreen({
                   <Text style={styles.chevron}>›</Text>
                 </TouchableOpacity>
               ))}
+              <TouchableOpacity
+                style={[styles.menuRow, { backgroundColor: "#FFF0F0" }]}
+                onPress={confirmDeleteAccount}
+                disabled={deletingAccount}
+                accessibilityRole="button"
+              >
+                <Text style={{ color: "#B42318", fontSize: 24 }}>×</Text>
+                <View style={styles.menuTextBlock}>
+                  <Text style={[styles.menuLabel, { color: "#B42318" }]}>
+                    {deletingAccount ? t("common.loading") : t("account.deleteTitle")}
+                  </Text>
+                </View>
+                <Text style={[styles.chevron, { color: "#B42318" }]}>›</Text>
+              </TouchableOpacity>
             </View>
           </View>
 

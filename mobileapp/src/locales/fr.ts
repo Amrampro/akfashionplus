@@ -422,6 +422,11 @@ export default {
     },
   },
   account: {
+    language: "Choisir la langue",
+    deleteTitle: "Suppression de compte",
+    deleteConfirm: "Oui, supprimer mon compte",
+    deleteMessage: "Voulez-vous vraiment supprimer définitivement votre compte ? Votre profil, vos adresses, favoris, avis et propositions de seconde main seront supprimés. Les documents de commande et de paiement nécessaires aux obligations légales et au suivi des opérations en cours seront conservés. Cette action est irréversible.",
+    deleteError: "La suppression n’a pas pu être effectuée. Veuillez réessayer.",
     loading: "Chargement du compte...",
     guestEyebrow: "Compte client",
     guestTitle: "Connectez-vous a votre espace.",
